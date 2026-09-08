@@ -1,0 +1,117 @@
+name: Bug report
+description: Report a reproducible problem with Sweep.
+title: "[Bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill in as much as
+        you can; a precise path and category makes fixes much faster.
+
+        **If files were moved or deleted unexpectedly, stop and report it
+        privately through [SECURITY.md](../security/policy) instead of opening
+        a public issue.**
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: This is not a security issue.
+          required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Sweep version
+      description: "Sweep menu → About Sweep, or `CFBundleShortVersionString` in the bundle."
+      placeholder: "1.0.0 (1)"
+    validations:
+      required: true
+
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: "macOS 14.5 (23F79)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: How was Sweep installed?
+      options:
+        - Built from source (make app / make run)
+        - make install
+        - Downloaded a release archive
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Affected area
+      options:
+        - Caches
+        - Logs
+        - Trash
+        - Developer caches
+        - Large files
+        - Window or UI
+        - CLI headless (--scan / --selftest)
+        - Build or packaging
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: fda
+    attributes:
+      label: Full Disk Access
+      description: Is Sweep granted Full Disk Access? (System Settings → Privacy & Security)
+      placeholder: "Yes / No / Not sure"
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps, in order. Mention the selected category and, if relevant, the scan root.
+      placeholder: |
+        1. Open Sweep
+        2. Select "Developer caches"
+        3. Press ⌘R
+        4. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include the exact error or refusal message if there is one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: selftest
+    attributes:
+      label: Self-test output
+      description: Run `./dist/Sweep.app/Contents/MacOS/Sweep --selftest` and paste the four lines.
+      render: shell
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Screenshots of the app window, `--scan` output, related issues, anything else useful.

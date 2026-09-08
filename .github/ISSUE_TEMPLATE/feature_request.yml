@@ -1,0 +1,60 @@
+name: Feature request
+description: Propose a change or a new capability for Sweep.
+title: "[Feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Sweep is intentionally small and dependency-free. Before proposing a
+        feature, check that it fits the safety model described in the README:
+        the app only moves items to the Trash, except for emptying it.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do that Sweep does not let you do today?
+      placeholder: "When I ..., I cannot ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe what the app should do. Keep it concrete — menus, categories, flags.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches, workarounds, or tools you tried.
+
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety impact
+      description: |
+        Does the proposal touch scanning, selection defaults, or deletion?
+        Anything that could move or delete a file must keep the current
+        guarantees: Trash-only, scan-root descendant, symlinks refused,
+        caution items unchecked by default.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Mockups, links, related issues.

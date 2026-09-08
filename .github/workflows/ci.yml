@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and self-test
+    # If the macos-15 runner image is not available for your account or
+    # organization, use macos-14 instead: both satisfy the macOS 14 minimum.
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: swift --version
+
+      - name: Build release binary
+        run: make build
+
+      - name: Assemble app bundle
+        run: make app
+
+      - name: Run safety self-test
+        run: ./dist/Sweep.app/Contents/MacOS/Sweep --selftest
+
+      - name: Package release archive
+        run: make release
+
+      - name: Verify checksum
+        run: cd dist && shasum -a 256 -c Sweep-*.zip.sha256
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sweep-macos
+          path: |
+            dist/Sweep-*.zip
+            dist/Sweep-*.zip.sha256
+          if-no-files-found: error
