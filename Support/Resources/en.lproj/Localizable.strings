@@ -1,0 +1,159 @@
+"category.caches.title" = "Caches";
+"category.caches.subtitle" = "Temporary files created by applications.";
+"category.logs.title" = "Logs";
+"category.logs.subtitle" = "Reports and activity histories.";
+"category.trash.title" = "Trash";
+"category.trash.subtitle" = "Items already moved to the Trash.";
+"category.developer.title" = "Developer Caches";
+"category.developer.subtitle" = "Build artifacts and tool caches.";
+"category.largeFiles.title" = "Large Files";
+"category.largeFiles.subtitle" = "Large and old files on the disk.";
+
+"root.developer" = "Development tools";
+"root.largeFiles.default" = "Downloads, Desktop, Documents, Pictures, Movies and Music";
+
+"safety.caution.running" = "App currently running — quit it, then rescan to make this item eligible";
+"safety.caution.debugSymbols" = "Debug symbols — Xcode will download them again if needed";
+"safety.caution.aiModels" = "Large AI models, sometimes not downloadable again";
+"safety.caution.archive" = "Archive, disk image or database — check before deleting";
+"safety.caution.label" = "Flagged item";
+"safety.protected.label" = "Protected item";
+"safety.protected.help" = "Protected item: never offered for deletion";
+
+"refusal.symlink" = "symbolic link refused";
+"refusal.invalidPath" = "invalid path";
+"refusal.protectedLocation" = "protected location";
+"refusal.outsideScan" = "outside the scanned area";
+"refusal.outsideTrash" = "outside the Trash";
+"refusal.unauthorizedRoot" = "unauthorized root";
+"refusal.protectedItem" = "protected item, deletion refused";
+"clean.failure.reason %@ %@" = "%@: %@";
+
+"action.scan" = "Scan";
+"action.rescan" = "Rescan";
+"action.cancel" = "Cancel";
+"action.close" = "Close";
+"action.retry" = "Try Again";
+"action.ok" = "OK";
+"action.revealInFinder" = "Reveal in Finder";
+"action.copyPath" = "Copy Path";
+"action.selectAll" = "Select All";
+"action.deselectAll" = "Deselect All";
+
+"menu.scanCategory" = "Scan Category";
+"toolbar.scanAll" = "Scan All";
+"toolbar.scanAll.help" = "Scan all categories";
+"toolbar.scan.help" = "Scan the selected category (⌘R)";
+
+"sidebar.section.cleaning" = "Cleaning";
+"sidebar.freeSpace %@" = "Free: %@";
+"sidebar.freeSpace.unavailable" = "Free space unavailable";
+"sidebar.fullDiskAccess" = "Full Disk Access…";
+"sidebar.fullDiskAccess.help" = "Opens System Settings to allow Sweep to scan all folders";
+
+"status.scanning" = "Scanning…";
+"status.scanned %@" = "%@ checked";
+
+"detail.emptySelection" = "Select a category";
+
+"items.count.one %lld" = "%lld item";
+"items.count.other %lld" = "%lld items";
+"items.flagged.one %lld" = "%lld item flagged";
+"items.flagged.other %lld" = "%lld items flagged";
+"items.selected.one %lld" = "%lld selected item";
+"items.selected.other %lld" = "%lld selected items";
+"items.removed.one %lld" = "%lld item removed";
+"items.removed.other %lld" = "%lld items removed";
+"items.failures.one %lld" = "%lld item not deleted";
+"items.failures.other %lld" = "%lld items not deleted";
+"summary.pair %@ %@" = "%@ · %@";
+
+"cleanbar.clean" = "Clean";
+"cleanbar.emptyTrash" = "Empty Trash";
+"cleanbar.clean.help" = "Move the selection to the Trash (recoverable)";
+"cleanbar.emptyTrash.help" = "Permanently delete the Trash contents";
+"cleanbar.selectAll.help" = "Selects all items";
+"cleanbar.selectAll.warningHelp" = "“Select All” only checks items without a warning";
+"cleanbar.flagged.help" = "Items unchecked for safety (running app, archive, database…) — review before selecting";
+"cleanbar.flagged.hideHelp" = "Show all items again";
+"filter.all %lld" = "All (%lld)";
+"filter.runningHint" = "Quit the running apps, then rescan";
+
+"confirm.title.clean" = "Clean these files?";
+"confirm.title.emptyTrash" = "Empty the Trash?";
+"confirm.body.clean" = "The items will be moved to the Trash — recoverable at any time, nothing is erased.";
+"confirm.body.emptyTrash" = "Definitive and irreversible action: the Trash contents will be deleted.";
+"confirm.moveToTrash" = "Move to Trash";
+
+"report.title.success" = "Cleaning complete";
+"report.title.partial" = "Partial cleaning";
+"report.done.permanent" = "Permanent deletion completed.";
+"report.done.trashed" = "The items were moved to the Trash.";
+
+"empty.nothingToClean.title" = "Nothing to clean";
+"empty.nothingToClean.message" = "No items found in this category.";
+"empty.notScanned.title" = "No scan yet";
+
+"failure.title" = "Scan failed";
+
+"largeFiles.minSize" = "Minimum size";
+"largeFiles.olderThan6Months" = "Modified more than 6 months ago";
+"largeFiles.userFolders" = "User folders";
+"largeFiles.userFolders.help" = "Scan Downloads, Desktop, Documents, Pictures, Movies and Music (projects and media libraries excluded)";
+"largeFiles.resetRoot.help" = "Back to user folders";
+"size.10mb" = "10 MB";
+"size.50mb" = "50 MB";
+"size.100mb" = "100 MB";
+"size.250mb" = "250 MB";
+"size.500mb" = "500 MB";
+
+"panel.choose" = "Choose";
+"panel.chooseFolder.message" = "Choose the folder to scan";
+"alert.protectedFolder.title" = "Protected folder";
+"alert.protectedFolder.message" = "Sweep does not offer files from this folder: it is reserved for the system, applications or their data.";
+
+"menu.aboutSweep" = "About Sweep";
+"about.title" = "About Sweep";
+"about.version %@" = "Version %@";
+"about.copyright" = "© 2026 David Molinari — MIT License";
+"about.builtWith" = "Built with SwiftUI — no third-party dependencies";
+"about.viewLicense" = "View MIT License";
+"about.license.title" = "MIT License";
+"about.copyVersion" = "Copy Version";
+"about.copied" = "Copied";
+"about.github" = "View on GitHub";
+
+"settings.tab.general" = "General";
+"settings.tab.largeFiles" = "Large Files";
+"settings.tab.storage" = "Storage";
+"settings.tab.about" = "About";
+"settings.general.behavior" = "Behavior";
+"settings.general.launchCategory" = "Category opened at launch";
+"settings.general.launchCategory.footer" = "The category selected here is shown when Sweep opens.";
+"settings.general.language" = "Language";
+"settings.general.language.current" = "Current language";
+"settings.general.language.footer" = "Sweep follows the language of macOS. Changes apply the next time Sweep opens.";
+"settings.general.openLanguageSettings" = "Open Language Settings…";
+"settings.general.reset" = "Reset Preferences…";
+"settings.general.reset.footer" = "Restores every setting to its default value. Nothing on disk is changed.";
+"settings.reset.title" = "Reset all preferences?";
+"settings.reset.message" = "The minimum size, the 6-month filter, the custom folder and the launch category will return to their default values.";
+"settings.reset.confirm" = "Reset";
+"settings.largeFiles.defaults" = "Scan defaults";
+"settings.largeFiles.threshold" = "Minimum size";
+"settings.largeFiles.oldOnly" = "Only files modified more than 6 months ago";
+"settings.largeFiles.folder" = "Folder";
+"settings.largeFiles.choose" = "Choose…";
+"settings.largeFiles.useDefaultFolder" = "Use User Folders";
+"settings.largeFiles.footer" = "These defaults apply to new scans of the Large Files category.";
+"settings.storage.volume" = "Volume";
+"settings.storage.freeSpace" = "Available space";
+"settings.storage.freeSpace.unavailable" = "Unavailable";
+"settings.storage.refresh" = "Refresh";
+"settings.storage.fullDiskAccess" = "Full Disk Access";
+"settings.storage.fullDiskAccess.description" = "Full Disk Access lets Sweep scan folders that macOS protects, such as other users' libraries. Without it, some locations are skipped.";
+"settings.storage.fullDiskAccess.open" = "Open Full Disk Access…";
+"settings.storage.footer" = "Sweep never deletes anything automatically. Every cleanup asks for confirmation and moves files to the Trash, except when you explicitly empty the Trash.";
+"settings.about.version" = "Version";
+"settings.about.license" = "License";
+"settings.about.github" = "GitHub";

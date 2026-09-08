@@ -1,0 +1,159 @@
+"category.caches.title" = "Caches";
+"category.caches.subtitle" = "Temporäre Dateien, die von Apps erstellt wurden.";
+"category.logs.title" = "Protokolle";
+"category.logs.subtitle" = "Berichte und Aktivitätsverläufe.";
+"category.trash.title" = "Papierkorb";
+"category.trash.subtitle" = "Bereits in den Papierkorb verschobene Objekte.";
+"category.developer.title" = "Entwickler-Caches";
+"category.developer.subtitle" = "Build-Artefakte und Tool-Caches.";
+"category.largeFiles.title" = "Große Dateien";
+"category.largeFiles.subtitle" = "Große und alte Dateien auf dem Datenträger.";
+
+"root.developer" = "Entwicklungswerkzeuge";
+"root.largeFiles.default" = "Downloads, Schreibtisch, Dokumente, Bilder, Filme und Musik";
+
+"safety.caution.running" = "App läuft — beenden Sie sie und scannen Sie erneut, um sie bereinigen zu können";
+"safety.caution.debugSymbols" = "Debug-Symbole – Xcode lädt sie bei Bedarf erneut herunter";
+"safety.caution.aiModels" = "Große KI-Modelle, teils nicht erneut herunterladbar";
+"safety.caution.archive" = "Archiv, Datenträgerabbild oder Datenbank – vor dem Löschen prüfen";
+"safety.caution.label" = "Markiertes Objekt";
+"safety.protected.label" = "Geschütztes Objekt";
+"safety.protected.help" = "Geschütztes Objekt: wird nie zum Löschen angeboten";
+
+"refusal.symlink" = "symbolischer Link abgelehnt";
+"refusal.invalidPath" = "ungültiger Pfad";
+"refusal.protectedLocation" = "geschützter Speicherort";
+"refusal.outsideScan" = "außerhalb des untersuchten Bereichs";
+"refusal.outsideTrash" = "außerhalb des Papierkorbs";
+"refusal.unauthorizedRoot" = "nicht zulässiger Stammordner";
+"refusal.protectedItem" = "geschütztes Objekt, Löschen abgelehnt";
+"clean.failure.reason %@ %@" = "%@: %@";
+
+"action.scan" = "Scannen";
+"action.rescan" = "Erneut scannen";
+"action.cancel" = "Abbrechen";
+"action.close" = "Schließen";
+"action.retry" = "Erneut versuchen";
+"action.ok" = "OK";
+"action.revealInFinder" = "Im Finder zeigen";
+"action.copyPath" = "Pfad kopieren";
+"action.selectAll" = "Alle auswählen";
+"action.deselectAll" = "Alle abwählen";
+
+"menu.scanCategory" = "Kategorie scannen";
+"toolbar.scanAll" = "Alle scannen";
+"toolbar.scanAll.help" = "Alle Kategorien scannen";
+"toolbar.scan.help" = "Ausgewählte Kategorie scannen (⌘R)";
+
+"sidebar.section.cleaning" = "Bereinigung";
+"sidebar.freeSpace %@" = "Frei: %@";
+"sidebar.freeSpace.unavailable" = "Freier Speicher nicht verfügbar";
+"sidebar.fullDiskAccess" = "Vollständiger Festplattenzugriff…";
+"sidebar.fullDiskAccess.help" = "Öffnet die Systemeinstellungen, damit Sweep alle Ordner scannen darf";
+
+"status.scanning" = "Scan läuft…";
+"status.scanned %@" = "%@ geprüft";
+
+"detail.emptySelection" = "Kategorie auswählen";
+
+"items.count.one %lld" = "%lld Objekt";
+"items.count.other %lld" = "%lld Objekte";
+"items.flagged.one %lld" = "%lld markiertes Objekt";
+"items.flagged.other %lld" = "%lld markierte Objekte";
+"items.selected.one %lld" = "%lld ausgewähltes Objekt";
+"items.selected.other %lld" = "%lld ausgewählte Objekte";
+"items.removed.one %lld" = "%lld Objekt entfernt";
+"items.removed.other %lld" = "%lld Objekte entfernt";
+"items.failures.one %lld" = "%lld Objekt nicht gelöscht";
+"items.failures.other %lld" = "%lld Objekte nicht gelöscht";
+"summary.pair %@ %@" = "%@ · %@";
+
+"cleanbar.clean" = "Bereinigen";
+"cleanbar.emptyTrash" = "Papierkorb leeren";
+"cleanbar.clean.help" = "Verschiebt die Auswahl in den Papierkorb (wiederherstellbar)";
+"cleanbar.emptyTrash.help" = "Löscht den Inhalt des Papierkorbs endgültig";
+"cleanbar.selectAll.help" = "Wählt alle Objekte aus";
+"cleanbar.selectAll.warningHelp" = "„Alle auswählen“ markiert nur Objekte ohne Warnung";
+"cleanbar.flagged.help" = "Objekte, die vorsichtshalber abgewählt wurden (laufende App, Archiv, Datenbank…) – vor der Auswahl prüfen";
+"cleanbar.flagged.hideHelp" = "Alle Elemente erneut anzeigen";
+"filter.all %lld" = "Alle (%lld)";
+"filter.runningHint" = "Beenden Sie die laufenden Apps und scannen Sie erneut";
+
+"confirm.title.clean" = "Diese Dateien bereinigen?";
+"confirm.title.emptyTrash" = "Papierkorb leeren?";
+"confirm.body.clean" = "Die Objekte werden in den Papierkorb verschoben – jederzeit wiederherstellbar, nichts wird endgültig gelöscht.";
+"confirm.body.emptyTrash" = "Endgültige und unwiderrufliche Aktion: Der Inhalt des Papierkorbs wird gelöscht.";
+"confirm.moveToTrash" = "In den Papierkorb";
+
+"report.title.success" = "Bereinigung abgeschlossen";
+"report.title.partial" = "Bereinigung teilweise";
+"report.done.permanent" = "Endgültige Löschung durchgeführt.";
+"report.done.trashed" = "Die Objekte wurden in den Papierkorb verschoben.";
+
+"empty.nothingToClean.title" = "Nichts zu bereinigen";
+"empty.nothingToClean.message" = "In dieser Kategorie wurden keine Objekte gefunden.";
+"empty.notScanned.title" = "Noch kein Scan";
+
+"failure.title" = "Scan fehlgeschlagen";
+
+"largeFiles.minSize" = "Mindestgröße";
+"largeFiles.olderThan6Months" = "Vor mehr als 6 Monaten geändert";
+"largeFiles.userFolders" = "Benutzerordner";
+"largeFiles.userFolders.help" = "Downloads, Schreibtisch, Dokumente, Bilder, Filme und Musik scannen (Projekte und Mediatheken ausgenommen)";
+"largeFiles.resetRoot.help" = "Zurück zu den Benutzerordnern";
+"size.10mb" = "10 MB";
+"size.50mb" = "50 MB";
+"size.100mb" = "100 MB";
+"size.250mb" = "250 MB";
+"size.500mb" = "500 MB";
+
+"panel.choose" = "Auswählen";
+"panel.chooseFolder.message" = "Ordner zum Scannen auswählen";
+"alert.protectedFolder.title" = "Geschützter Ordner";
+"alert.protectedFolder.message" = "Sweep bietet keine Dateien aus diesem Ordner an: Er ist für das System, Anwendungen oder deren Daten reserviert.";
+
+"menu.aboutSweep" = "Über Sweep";
+"about.title" = "Über Sweep";
+"about.version %@" = "Version %@";
+"about.copyright" = "© 2026 David Molinari — MIT-Lizenz";
+"about.builtWith" = "Entwickelt mit SwiftUI – keine Abhängigkeiten von Drittanbietern";
+"about.viewLicense" = "MIT-Lizenz anzeigen";
+"about.license.title" = "MIT-Lizenz";
+"about.copyVersion" = "Version kopieren";
+"about.copied" = "Kopiert";
+"about.github" = "Auf GitHub ansehen";
+
+"settings.tab.general" = "Allgemein";
+"settings.tab.largeFiles" = "Große Dateien";
+"settings.tab.storage" = "Speicher";
+"settings.tab.about" = "Über";
+"settings.general.behavior" = "Verhalten";
+"settings.general.launchCategory" = "Beim Start geöffnete Kategorie";
+"settings.general.launchCategory.footer" = "Die hier ausgewählte Kategorie wird beim Öffnen von Sweep angezeigt.";
+"settings.general.language" = "Sprache";
+"settings.general.language.current" = "Aktuelle Sprache";
+"settings.general.language.footer" = "Sweep folgt der Sprache von macOS. Änderungen gelten beim nächsten Öffnen von Sweep.";
+"settings.general.openLanguageSettings" = "Spracheinstellungen öffnen…";
+"settings.general.reset" = "Einstellungen zurücksetzen…";
+"settings.general.reset.footer" = "Setzt alle Einstellungen auf die Standardwerte zurück. Auf dem Datenträger wird nichts geändert.";
+"settings.reset.title" = "Alle Einstellungen zurücksetzen?";
+"settings.reset.message" = "Mindestgröße, 6-Monats-Filter, benutzerdefinierter Ordner und Startkategorie werden auf ihre Standardwerte zurückgesetzt.";
+"settings.reset.confirm" = "Zurücksetzen";
+"settings.largeFiles.defaults" = "Scan-Standardwerte";
+"settings.largeFiles.threshold" = "Mindestgröße";
+"settings.largeFiles.oldOnly" = "Nur Dateien, die vor mehr als 6 Monaten geändert wurden";
+"settings.largeFiles.folder" = "Ordner";
+"settings.largeFiles.choose" = "Auswählen…";
+"settings.largeFiles.useDefaultFolder" = "Benutzerordner verwenden";
+"settings.largeFiles.footer" = "Diese Standardwerte gelten für neue Scans der Kategorie „Große Dateien“.";
+"settings.storage.volume" = "Volume";
+"settings.storage.freeSpace" = "Verfügbarer Speicher";
+"settings.storage.freeSpace.unavailable" = "Nicht verfügbar";
+"settings.storage.refresh" = "Aktualisieren";
+"settings.storage.fullDiskAccess" = "Vollständiger Festplattenzugriff";
+"settings.storage.fullDiskAccess.description" = "Der vollständige Festplattenzugriff erlaubt Sweep, von macOS geschützte Ordner zu scannen, etwa die Bibliotheken anderer Benutzer. Ohne ihn werden einige Speicherorte übersprungen.";
+"settings.storage.fullDiskAccess.open" = "Vollständigen Festplattenzugriff öffnen…";
+"settings.storage.footer" = "Sweep löscht nie automatisch etwas. Jede Bereinigung erfordert eine Bestätigung und verschiebt Dateien in den Papierkorb – außer Sie leeren den Papierkorb ausdrücklich.";
+"settings.about.version" = "Version";
+"settings.about.license" = "Lizenz";
+"settings.about.github" = "GitHub";

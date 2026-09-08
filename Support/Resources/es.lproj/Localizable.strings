@@ -1,0 +1,159 @@
+"category.caches.title" = "Cachés";
+"category.caches.subtitle" = "Archivos temporales creados por las aplicaciones.";
+"category.logs.title" = "Registros";
+"category.logs.subtitle" = "Informes e historiales de actividad.";
+"category.trash.title" = "Papelera";
+"category.trash.subtitle" = "Elementos que ya están en la Papelera.";
+"category.developer.title" = "Cachés de desarrollo";
+"category.developer.subtitle" = "Artefactos de compilación y cachés de herramientas.";
+"category.largeFiles.title" = "Archivos grandes";
+"category.largeFiles.subtitle" = "Archivos grandes y antiguos del disco.";
+
+"root.developer" = "Herramientas de desarrollo";
+"root.largeFiles.default" = "Descargas, Escritorio, Documentos, Imágenes, Películas y Música";
+
+"safety.caution.running" = "Aplicación en ejecución: ciérrala y vuelve a analizar para poder limpiarla";
+"safety.caution.debugSymbols" = "Símbolos de depuración: Xcode volverá a descargarlos si es necesario";
+"safety.caution.aiModels" = "Modelos de IA grandes, a veces no se pueden volver a descargar";
+"safety.caution.archive" = "Archivo, imagen de disco o base de datos: comprueba antes de eliminar";
+"safety.caution.label" = "Elemento marcado";
+"safety.protected.label" = "Elemento protegido";
+"safety.protected.help" = "Elemento protegido: nunca se ofrece para eliminar";
+
+"refusal.symlink" = "enlace simbólico rechazado";
+"refusal.invalidPath" = "ruta no válida";
+"refusal.protectedLocation" = "ubicación protegida";
+"refusal.outsideScan" = "fuera del área analizada";
+"refusal.outsideTrash" = "fuera de la Papelera";
+"refusal.unauthorizedRoot" = "raíz no autorizada";
+"refusal.protectedItem" = "elemento protegido, eliminación rechazada";
+"clean.failure.reason %@ %@" = "%@: %@";
+
+"action.scan" = "Analizar";
+"action.rescan" = "Volver a analizar";
+"action.cancel" = "Cancelar";
+"action.close" = "Cerrar";
+"action.retry" = "Reintentar";
+"action.ok" = "OK";
+"action.revealInFinder" = "Mostrar en el Finder";
+"action.copyPath" = "Copiar la ruta";
+"action.selectAll" = "Seleccionar todo";
+"action.deselectAll" = "Deseleccionar todo";
+
+"menu.scanCategory" = "Analizar la categoría";
+"toolbar.scanAll" = "Analizar todo";
+"toolbar.scanAll.help" = "Analizar todas las categorías";
+"toolbar.scan.help" = "Analizar la categoría seleccionada (⌘R)";
+
+"sidebar.section.cleaning" = "Limpieza";
+"sidebar.freeSpace %@" = "Libre: %@";
+"sidebar.freeSpace.unavailable" = "Espacio libre no disponible";
+"sidebar.fullDiskAccess" = "Acceso total al disco…";
+"sidebar.fullDiskAccess.help" = "Abre Ajustes del Sistema para permitir que Sweep analice todas las carpetas";
+
+"status.scanning" = "Analizando…";
+"status.scanned %@" = "%@ analizados";
+
+"detail.emptySelection" = "Selecciona una categoría";
+
+"items.count.one %lld" = "%lld elemento";
+"items.count.other %lld" = "%lld elementos";
+"items.flagged.one %lld" = "%lld elemento marcado";
+"items.flagged.other %lld" = "%lld elementos marcados";
+"items.selected.one %lld" = "%lld elemento seleccionado";
+"items.selected.other %lld" = "%lld elementos seleccionados";
+"items.removed.one %lld" = "%lld elemento eliminado";
+"items.removed.other %lld" = "%lld elementos eliminados";
+"items.failures.one %lld" = "%lld elemento no eliminado";
+"items.failures.other %lld" = "%lld elementos no eliminados";
+"summary.pair %@ %@" = "%@ · %@";
+
+"cleanbar.clean" = "Limpiar";
+"cleanbar.emptyTrash" = "Vaciar la Papelera";
+"cleanbar.clean.help" = "Mueve la selección a la Papelera (recuperable)";
+"cleanbar.emptyTrash.help" = "Elimina definitivamente el contenido de la Papelera";
+"cleanbar.selectAll.help" = "Selecciona todos los elementos";
+"cleanbar.selectAll.warningHelp" = "«Seleccionar todo» solo marca los elementos sin advertencia";
+"cleanbar.flagged.help" = "Elementos desmarcados por precaución (app en ejecución, archivo, base de datos…) — revísalos antes de seleccionarlos";
+"cleanbar.flagged.hideHelp" = "Mostrar de nuevo todos los elementos";
+"filter.all %lld" = "Todo (%lld)";
+"filter.runningHint" = "Cierra las aplicaciones en ejecución y vuelve a analizar";
+
+"confirm.title.clean" = "¿Limpiar estos archivos?";
+"confirm.title.emptyTrash" = "¿Vaciar la Papelera?";
+"confirm.body.clean" = "Los elementos se moverán a la Papelera: recuperables en cualquier momento, no se borra nada.";
+"confirm.body.emptyTrash" = "Acción definitiva e irreversible: se eliminará el contenido de la Papelera.";
+"confirm.moveToTrash" = "Mover a la Papelera";
+
+"report.title.success" = "Limpieza completada";
+"report.title.partial" = "Limpieza parcial";
+"report.done.permanent" = "Eliminación definitiva realizada.";
+"report.done.trashed" = "Los elementos se movieron a la Papelera.";
+
+"empty.nothingToClean.title" = "Nada que limpiar";
+"empty.nothingToClean.message" = "No se detectaron elementos en esta categoría.";
+"empty.notScanned.title" = "Aún no hay análisis";
+
+"failure.title" = "No se pudo analizar";
+
+"largeFiles.minSize" = "Tamaño mínimo";
+"largeFiles.olderThan6Months" = "Modificados hace más de 6 meses";
+"largeFiles.userFolders" = "Carpetas del usuario";
+"largeFiles.userFolders.help" = "Analizar Descargas, Escritorio, Documentos, Imágenes, Películas y Música (proyectos y fototecas excluidos)";
+"largeFiles.resetRoot.help" = "Volver a las carpetas del usuario";
+"size.10mb" = "10 MB";
+"size.50mb" = "50 MB";
+"size.100mb" = "100 MB";
+"size.250mb" = "250 MB";
+"size.500mb" = "500 MB";
+
+"panel.choose" = "Elegir";
+"panel.chooseFolder.message" = "Elige la carpeta que quieres analizar";
+"alert.protectedFolder.title" = "Carpeta protegida";
+"alert.protectedFolder.message" = "Sweep no ofrece los archivos de esta carpeta: está reservada al sistema, a las aplicaciones o a sus datos.";
+
+"menu.aboutSweep" = "Acerca de Sweep";
+"about.title" = "Acerca de Sweep";
+"about.version %@" = "Versión %@";
+"about.copyright" = "© 2026 David Molinari — Licencia MIT";
+"about.builtWith" = "Creado con SwiftUI: sin dependencias de terceros";
+"about.viewLicense" = "Ver la licencia MIT";
+"about.license.title" = "Licencia MIT";
+"about.copyVersion" = "Copiar la versión";
+"about.copied" = "Copiado";
+"about.github" = "Ver en GitHub";
+
+"settings.tab.general" = "General";
+"settings.tab.largeFiles" = "Archivos grandes";
+"settings.tab.storage" = "Almacenamiento";
+"settings.tab.about" = "Acerca de";
+"settings.general.behavior" = "Comportamiento";
+"settings.general.launchCategory" = "Categoría al abrir la app";
+"settings.general.launchCategory.footer" = "La categoría seleccionada aquí se muestra al abrir Sweep.";
+"settings.general.language" = "Idioma";
+"settings.general.language.current" = "Idioma actual";
+"settings.general.language.footer" = "Sweep sigue el idioma de macOS. El cambio se aplica la próxima vez que abras Sweep.";
+"settings.general.openLanguageSettings" = "Abrir ajustes de idioma…";
+"settings.general.reset" = "Restablecer preferencias…";
+"settings.general.reset.footer" = "Restaura todas las preferencias a sus valores predeterminados. No se modifica nada en el disco.";
+"settings.reset.title" = "¿Restablecer todas las preferencias?";
+"settings.reset.message" = "El tamaño mínimo, el filtro de 6 meses, la carpeta personalizada y la categoría de inicio volverán a sus valores predeterminados.";
+"settings.reset.confirm" = "Restablecer";
+"settings.largeFiles.defaults" = "Valores predeterminados de análisis";
+"settings.largeFiles.threshold" = "Tamaño mínimo";
+"settings.largeFiles.oldOnly" = "Solo archivos modificados hace más de 6 meses";
+"settings.largeFiles.folder" = "Carpeta";
+"settings.largeFiles.choose" = "Elegir…";
+"settings.largeFiles.useDefaultFolder" = "Usar carpetas del usuario";
+"settings.largeFiles.footer" = "Estos valores se aplican a los nuevos análisis de la categoría Archivos grandes.";
+"settings.storage.volume" = "Volumen";
+"settings.storage.freeSpace" = "Espacio disponible";
+"settings.storage.freeSpace.unavailable" = "No disponible";
+"settings.storage.refresh" = "Actualizar";
+"settings.storage.fullDiskAccess" = "Acceso total al disco";
+"settings.storage.fullDiskAccess.description" = "El acceso total al disco permite a Sweep analizar carpetas protegidas por macOS, como las bibliotecas de otros usuarios. Sin él, se omiten algunas ubicaciones.";
+"settings.storage.fullDiskAccess.open" = "Abrir el acceso total al disco…";
+"settings.storage.footer" = "Sweep nunca elimina nada automáticamente. Cada limpieza pide confirmación y mueve los archivos a la Papelera, salvo cuando vacías la Papelera de forma explícita.";
+"settings.about.version" = "Versión";
+"settings.about.license" = "Licencia";
+"settings.about.github" = "GitHub";

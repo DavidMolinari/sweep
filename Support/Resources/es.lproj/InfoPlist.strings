@@ -1,0 +1,4 @@
+"NSDesktopFolderUsageDescription" = "Sweep analiza los archivos grandes del Escritorio.";
+"NSDocumentsFolderUsageDescription" = "Sweep analiza los archivos grandes de Documentos.";
+"NSDownloadsFolderUsageDescription" = "Sweep analiza los archivos grandes de Descargas.";
+"NSRemovableVolumesUsageDescription" = "Sweep analiza los volúmenes seleccionados.";
