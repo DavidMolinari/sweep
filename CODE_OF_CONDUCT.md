@@ -1,9 +1,5 @@
 # Contributor Covenant Code of Conduct
 
-> **Note to maintainers:** the contact address below is a placeholder
-> (`conduct@example.com`). Replace it with a monitored address before the
-> repository is made public.
-
 ## Our Pledge
 
 We as members, contributors, and leaders pledge to make participation in our
@@ -63,8 +59,10 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
-`conduct@example.com` (placeholder — see the note at the top of this file).
+reported to the maintainer on GitHub
+([@DavidMolinari](https://github.com/DavidMolinari)). For a confidential report,
+use the repository's private reporting channel described in
+[SECURITY.md](SECURITY.md).
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the

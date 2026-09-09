@@ -53,7 +53,9 @@ make run
 ```
 
 `make run` builds the release binary, assembles `dist/Sweep.app`, signs it
-ad-hoc, and opens it. To build the bundle without launching it:
+ad-hoc, and opens it. The binary is built **universal** (arm64 + x86_64) when
+the toolchain supports the cross-compile, and the build falls back to the host
+architecture otherwise. To build the bundle without launching it:
 
 ```sh
 make app
@@ -67,7 +69,7 @@ make app
 | `make app` | Assemble and ad-hoc sign `dist/Sweep.app` |
 | `make run` | `make app` then open the app |
 | `make install` | Copy the app to `/Applications` |
-| `make release` | Build a zip of the app plus a SHA-256 checksum in `dist/` |
+| `make release` | Self-test, then build a zip of the app (`LICENSE` and `README.md` included) plus a SHA-256 checksum in `dist/` |
 | `make clean` | Remove build products and `dist/` |
 
 ### Install
@@ -79,7 +81,7 @@ make install
 The bundle is copied to `/Applications/Sweep.app`. If `/Applications` is not
 writable by your user, the command stops and tells you to re-run it with
 `sudo`. Releases are signed ad-hoc, not notarized: a downloaded copy may need
-a right-click → **Open** the first time, or `xattr -d com.apple.quarantine`.
+a right-click → **Open** the first time.
 
 ## Safety model
 
@@ -128,16 +130,26 @@ removed. Nothing else in the app deletes permanently.
 ./dist/Sweep.app/Contents/MacOS/Sweep --selftest
 ```
 
-Four checks run against temporary fixtures and clean up after themselves:
+Twelve checks run against temporary fixtures and clean up after themselves:
 
 ```
 move-to-trash:      removed=1 failures=0 gone=true
 outside-root:       removed=0 failures=1 intact=true
 trash-outside:      removed=0 failures=1 intact=true
 empty-trash:        removed=1 failures=0 gone=true permanent=true
+symlink-root:       issue=symbolic link root refused
+trash-resolved:     removed=0 failures=1 intact=true
+large-roots:        slash=true users=true volumes=true home=true library=true child=true
+case-fold:          removed=0 failures=1 intact=true
+trash-app-protected:safety=true removed=0 failures=1 intact=true
+select-all-preserve:safe=true flagged=true
+select-all-clear:   allCleared=true
+selftest:           0 failures
 ```
 
-Exit code is 0 only when all four pass. CI runs this on every push.
+Exit code is 0 only when every check passes (the final line reports
+`0 failures`); `case-fold` is skipped on a case-sensitive volume. CI runs this
+on every push.
 
 ## Full Disk Access
 
@@ -187,7 +199,7 @@ read-only: `--scan` never deletes or moves anything.
 
 ### `--selftest`
 
-Runs the four guardrail tests described above and exits 0 (pass) or 1 (fail).
+Runs the twelve guardrail tests described above and exits 0 (pass) or 1 (fail).
 Useful before and after a release build, and in CI.
 
 ## Project layout

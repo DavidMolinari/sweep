@@ -44,11 +44,17 @@ make app
 ./dist/Sweep.app/Contents/MacOS/Sweep --selftest
 ```
 
-All four checks must pass before a pull request is merged:
+All twelve checks must pass before a pull request is merged; the final line of
+the output reports `0 failures`:
 
 ```
-move-to-trash  outside-root  trash-outside  empty-trash
+move-to-trash  outside-root  trash-outside  empty-trash  symlink-root
+trash-resolved  large-roots  case-fold  trash-app-protected
+select-all-preserve  select-all-clear
 ```
+
+`case-fold` is skipped (and does not count as a failure) on a case-sensitive
+volume.
 
 For a manual smoke test of the scan pipeline:
 
@@ -112,7 +118,8 @@ changes.
 
 1. Open an issue first for anything larger than a bug fix or a new cache path.
 2. Keep the diff focused; describe what changes and why, not how.
-3. Fill in the pull request template. State that `--selftest` is 4/4.
+3. Fill in the pull request template. State that `--selftest` reports
+   `0 failures`.
 4. Update `README.md`, `README.fr.md`, and `CHANGELOG.md` when behavior or
    commands change.
 5. UI changes need a screenshot of the app window (light or dark) showing the

@@ -10,10 +10,9 @@
 
 Please do not open a public issue for security problems.
 
-- Preferred: use GitHub private vulnerability reporting —
-  [Security → Report a vulnerability](https://github.com/DavidMolinari/sweep/security/advisories/new).
-- Alternative: email `security@example.com` (placeholder — maintainers must
-  replace this address with a monitored one before publication).
+Use GitHub private vulnerability reporting —
+[Security → Report a vulnerability](https://github.com/DavidMolinari/sweep/security/advisories/new).
+It is the only reporting channel: Sweep has no security email address.
 
 Include as much as you can: affected version (`Sweep` menu → About, or
 `--selftest` output), macOS version, steps to reproduce, and any proof of

@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, self-test and publish draft
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: swift --version
+
+      - name: Verify tag matches Info.plist version
+        run: |
+          version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" Support/Info.plist)
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "error: tag ${GITHUB_REF_NAME} does not match Support/Info.plist ${version}" >&2
+            exit 1
+          fi
+          echo "→ releasing ${version}"
+
+      - name: Build, self-test, archive and checksum
+        run: make release
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { capture = 1; next }
+            capture && /^## \[/ { exit }
+            capture { print }
+          ' CHANGELOG.md > release-notes.md
+          if ! grep -q . release-notes.md; then
+            echo "See [CHANGELOG.md](CHANGELOG.md) for the full list of changes." > release-notes.md
+          fi
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Sweep ${{ github.ref_name }}
+          draft: true
+          body_path: release-notes.md
+          files: |
+            dist/Sweep-*.zip
+            dist/Sweep-*.zip.sha256
+          fail_on_unmatched_files: true

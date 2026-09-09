@@ -15,7 +15,7 @@
 <!-- Describe what you ran and what you observed. -->
 
 - [ ] `make app` succeeds
-- [ ] `./dist/Sweep.app/Contents/MacOS/Sweep --selftest` is 4/4
+- [ ] `./dist/Sweep.app/Contents/MacOS/Sweep --selftest` reports `0 failures`
 - [ ] `./dist/Sweep.app/Contents/MacOS/Sweep --scan <category>` behaves as expected (if the scan code changed)
 - [ ] UI changes: screenshot of the app window attached below
 

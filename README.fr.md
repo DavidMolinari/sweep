@@ -54,7 +54,9 @@ make run
 ```
 
 `make run` compile le binaire release, fabrique `dist/Sweep.app`, le signe en
-ad-hoc et l'ouvre. Pour fabriquer le bundle sans le lancer :
+ad-hoc et l'ouvre. Le binaire est compilé **universel** (arm64 + x86_64) quand
+la chaîne d'outils le permet, avec repli sur l'architecture native sinon. Pour
+fabriquer le bundle sans le lancer :
 
 ```sh
 make app
@@ -68,7 +70,7 @@ make app
 | `make app` | Fabrique et signe en ad-hoc `dist/Sweep.app` |
 | `make run` | `make app` puis ouvre l'app |
 | `make install` | Copie l'app dans `/Applications` |
-| `make release` | Produit dans `dist/` un zip de l'app avec son empreinte SHA-256 |
+| `make release` | Auto-tests, puis zip de l'app (`LICENSE` et `README.md` inclus) avec empreinte SHA-256 dans `dist/` |
 | `make clean` | Supprime les produits de compilation et `dist/` |
 
 ### Installation
@@ -81,7 +83,7 @@ Le bundle est copié dans `/Applications/Sweep.app`. Si `/Applications` n'est
 pas accessible en écriture à votre utilisateur, la commande s'arrête en
 indiquant de la relancer avec `sudo`. Les versions publiées sont signées en
 ad-hoc, pas notariées : une copie téléchargée peut nécessiter un clic droit →
-**Ouvrir** au premier lancement, ou `xattr -d com.apple.quarantine`.
+**Ouvrir** au premier lancement.
 
 ## Modèle de sûreté
 
@@ -134,7 +136,7 @@ définitivement.
 ./dist/Sweep.app/Contents/MacOS/Sweep --selftest
 ```
 
-Quatre vérifications s'exécutent sur des fixtures temporaires et nettoient
+Douze vérifications s'exécutent sur des fixtures temporaires et nettoient
 derrière elles :
 
 ```
@@ -142,10 +144,19 @@ move-to-trash:      removed=1 failures=0 gone=true
 outside-root:       removed=0 failures=1 intact=true
 trash-outside:      removed=0 failures=1 intact=true
 empty-trash:        removed=1 failures=0 gone=true permanent=true
+symlink-root:       issue=symbolic link root refused
+trash-resolved:     removed=0 failures=1 intact=true
+large-roots:        slash=true users=true volumes=true home=true library=true child=true
+case-fold:          removed=0 failures=1 intact=true
+trash-app-protected:safety=true removed=0 failures=1 intact=true
+select-all-preserve:safe=true flagged=true
+select-all-clear:   allCleared=true
+selftest:           0 failures
 ```
 
-Le code de sortie vaut 0 seulement si les quatre passent. La CI l'exécute à
-chaque push.
+Le code de sortie vaut 0 seulement si toutes passent (la dernière ligne
+indique `0 failures`) ; `case-fold` est ignoré sur un volume sensible à la
+casse. La CI l'exécute à chaque push.
 
 ## Accès complet au disque
 
@@ -196,7 +207,7 @@ en lecture seule : `--scan` ne supprime et ne déplace rien.
 
 ### `--selftest`
 
-Exécute les quatre tests de garde-fous décrits plus haut et sort avec 0
+Exécute les douze tests de garde-fous décrits plus haut et sort avec 0
 (succès) ou 1 (échec). Utile avant et après une compilation de release, et en
 CI.
 

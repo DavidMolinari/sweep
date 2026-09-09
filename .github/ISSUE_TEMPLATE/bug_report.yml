@@ -10,8 +10,8 @@ body:
         you can; a precise path and category makes fixes much faster.
 
         **If files were moved or deleted unexpectedly, stop and report it
-        privately through [SECURITY.md](../security/policy) instead of opening
-        a public issue.**
+        privately through [SECURITY.md](https://github.com/DavidMolinari/sweep/security/policy)
+        instead of opening a public issue.**
 
   - type: checkboxes
     id: preflight
@@ -107,7 +107,7 @@ body:
     id: selftest
     attributes:
       label: Self-test output
-      description: Run `./dist/Sweep.app/Contents/MacOS/Sweep --selftest` and paste the four lines.
+      description: Run `./dist/Sweep.app/Contents/MacOS/Sweep --selftest` and paste the output.
       render: shell
 
   - type: textarea
