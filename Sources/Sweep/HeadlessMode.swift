@@ -16,7 +16,7 @@ enum HeadlessMode {
         var failures = 0
 
         func check(_ label: String, _ ok: Bool, _ detail: String) {
-            let padded = label.padding(toLength: 20, withPad: " ", startingAt: 0)
+            let padded = label.padding(toLength: 22, withPad: " ", startingAt: 0)
             print("\(padded)\(detail)")
             if !ok { failures += 1 }
         }
@@ -35,8 +35,8 @@ enum HeadlessMode {
         let trashItem = ScanItem(url: trashFixture, root: cachesBase, size: DiskScanner.size(of: trashFixture), isDirectory: true, modified: nil, isSelected: true)
         let trashReport = Cleaner.clean(items: [trashItem], category: .caches)
         let trashedGone = !fm.fileExists(atPath: trashFixture.path(percentEncoded: false))
-        check("move-to-trash:", trashReport.removedIDs.count == 1 && trashReport.failures.isEmpty && trashedGone,
-              "removed=\(trashReport.removedIDs.count) failures=\(trashReport.failures.count) gone=\(trashedGone)")
+        check("move-to-trash:", trashReport.removedIDs.count == 1 && trashReport.failures.isEmpty && trashedGone && !trashReport.permanent,
+              "removed=\(trashReport.removedIDs.count) failures=\(trashReport.failures.count) gone=\(trashedGone) permanent=\(trashReport.permanent)")
 
         let outsideFixture = makeFixture(at: cachesBase, name: "outside-\(token)")
         let outsideItem = ScanItem(url: outsideFixture, root: cachesBase.appendingPathComponent("other-root"), size: 0, isDirectory: true, modified: nil, isSelected: true)
@@ -76,6 +76,26 @@ enum HeadlessMode {
         let escapeIntact = fm.fileExists(atPath: escapeFile.path(percentEncoded: false))
         check("trash-resolved:", escapedReport.removedIDs.isEmpty && escapedReport.failures.count == 1 && escapeIntact,
               "removed=\(escapedReport.removedIDs.count) failures=\(escapedReport.failures.count) intact=\(escapeIntact)")
+
+        let fileLinkURL = cachesBase.appendingPathComponent("file-link-\(token)")
+        try? fm.removeItem(at: fileLinkURL)
+        _ = try? fm.createSymbolicLink(at: fileLinkURL, withDestinationURL: symlinkTarget)
+        let fileLinkItem = ScanItem(url: fileLinkURL, root: cachesBase, size: 0, isDirectory: false, modified: nil, isSelected: true)
+        let fileLinkReason = Cleaner.refusalReason(for: fileLinkItem, category: .caches)
+        check("refusal-symlink:", fileLinkReason == .symlink, "issue=\(fileLinkReason?.message ?? "none")")
+
+        let missingItem = ScanItem(url: cachesBase.appendingPathComponent("missing-\(token)"), root: cachesBase, size: 0, isDirectory: false, modified: nil, isSelected: true)
+        let missingReason = Cleaner.refusalReason(for: missingItem, category: .caches)
+        check("refusal-missing-path:", missingReason == .invalidPath, "issue=\(missingReason?.message ?? "none")")
+
+        let sharedBase = URL(fileURLWithPath: "/Users/Shared/sweep-selftest-\(token)", isDirectory: true)
+        try? fm.createDirectory(at: sharedBase, withIntermediateDirectories: true)
+        let sharedFile = sharedBase.appendingPathComponent("item-\(token).bin")
+        fm.createFile(atPath: sharedFile.path(percentEncoded: false), contents: Data(count: 4096))
+        let sharedItem = ScanItem(url: sharedFile, root: sharedBase, size: 4096, isDirectory: false, modified: nil, isSelected: true)
+        let sharedReason = Cleaner.refusalReason(for: sharedItem, category: .caches)
+        check("refusal-foreign-root:", sharedReason == .unauthorizedRoot, "issue=\(sharedReason?.message ?? "none")")
+        try? fm.removeItem(at: sharedBase)
 
         let slashRefused = !DiskScanner.isAllowedLargeFileRoot(URL(fileURLWithPath: "/"))
         let usersRefused = !DiskScanner.isAllowedLargeFileRoot(URL(fileURLWithPath: "/Users"))

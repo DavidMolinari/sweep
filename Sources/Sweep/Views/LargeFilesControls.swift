@@ -44,9 +44,9 @@ struct LargeFilesControls: View {
                 model.scan(.largeFiles)
             }
             .buttonStyle(.bordered)
-            .disabled(model.isAnyScanning)
+            .disabled(model.isAnyScanning || model.isAnyCleaning)
         }
-        .disabled(model.isAnyScanning)
+        .disabled(model.isAnyScanning || model.isAnyCleaning)
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .contentSurface(cornerRadius: BrandPalette.Radius.field)

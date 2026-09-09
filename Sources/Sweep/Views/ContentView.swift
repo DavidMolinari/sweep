@@ -34,7 +34,7 @@ struct ContentView: View {
                 } label: {
                     Label("toolbar.scanAll", systemImage: "sparkles")
                 }
-                .disabled(model.isAnyScanning)
+                .disabled(model.isAnyScanning || model.isAnyCleaning)
                 .help("toolbar.scanAll.help")
             }
             ToolbarItem {
@@ -43,7 +43,7 @@ struct ContentView: View {
                 } label: {
                     Label("action.scan", systemImage: "arrow.clockwise")
                 }
-                .disabled(model.selection == nil || model.isAnyScanning)
+                .disabled(model.selection == nil || model.isAnyScanning || model.isAnyCleaning)
                 .help("toolbar.scan.help")
             }
         }

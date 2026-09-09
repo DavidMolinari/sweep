@@ -199,7 +199,7 @@ read-only: `--scan` never deletes or moves anything.
 
 ### `--selftest`
 
-Runs the twelve guardrail tests described above and exits 0 (pass) or 1 (fail).
+Runs the guardrail test suite described above and exits 0 (pass) or 1 (fail).
 Useful before and after a release build, and in CI.
 
 ## Project layout

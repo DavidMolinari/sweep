@@ -47,8 +47,8 @@ The target chains every safety gate and aborts on the first failure:
 1. `make app` — release build, bundle assembly, ad-hoc signature. The build is
    attempted **universal** (`swift build -c release --arch arm64 --arch x86_64`)
    and falls back to the host architecture if the cross-compile is unavailable.
-2. `--selftest` — the guardrail suite must pass (12 checks on a case-insensitive
-   volume; `case-fold` is skipped on a case-sensitive one).
+2. `--selftest` — the guardrail suite must pass on a case-insensitive
+   volume; `case-fold` is skipped on a case-sensitive one.
 3. `plutil -lint` on the bundled `Info.plist` and
    `codesign --verify --deep --strict` on the bundle.
 4. Archive `Sweep.app`, `LICENSE`, and `README.md` at the zip root, then write

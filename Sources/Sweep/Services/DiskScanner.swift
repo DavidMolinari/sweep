@@ -34,7 +34,7 @@ enum DiskScanner {
 
         static let none = ScanDiagnostics()
 
-        var hadErrors: Bool { !rootFailures.isEmpty }
+        var hadErrors: Bool { !rootFailures.isEmpty || skippedItems > 0 }
         var readNothing: Bool { attemptedRoots > 0 && rootFailures.count >= attemptedRoots }
     }
 

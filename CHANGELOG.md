@@ -30,9 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   build (arm64 + x86_64) with a native fallback, and re-verifies the SHA-256.
 - The cleaning report distinguishes “moved to the Trash (recoverable)” from
   “permanently deleted”, showing the bytes for the mode that actually ran.
-- The self-test covers twelve guardrail scenarios instead of four: symlinked
-  roots, case-insensitive protected paths, custom large-file roots, protected
-  bundles in the Trash, and select-all semantics.
+- The self-test covers a broad guardrail suite instead of four scenarios:
+  symlinked roots, case-insensitive protected paths, custom large-file roots,
+  protected bundles in the Trash, and select-all semantics.
 - Release runbook completed: staple and validate the notarization ticket,
   re-zip after stapling, regenerate the checksum, and check Gatekeeper; no
   entitlements are required.
