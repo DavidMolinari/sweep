@@ -1,6 +1,6 @@
 import Foundation
 
-enum CautionReason: Equatable {
+enum CautionReason: Equatable, Sendable {
     case appRunning
     case debugSymbols
     case aiModels
@@ -25,7 +25,7 @@ enum CautionReason: Equatable {
     }
 }
 
-enum ItemSafety: Equatable {
+enum ItemSafety: Equatable, Sendable {
     case safe
     case caution(CautionReason)
     case protected(String)
@@ -56,7 +56,7 @@ enum ItemSafety: Equatable {
     }
 }
 
-struct ScanItem: Identifiable, Equatable {
+struct ScanItem: Identifiable, Equatable, Sendable {
     let id: UUID
     let url: URL
     let root: URL

@@ -4,6 +4,40 @@ import Foundation
 enum DiskScanner {
     typealias ProgressHandler = @Sendable (Int64) -> Void
 
+    struct ScanDiagnostics: Equatable, Sendable {
+        enum RootIssue: Equatable, Sendable {
+            case symlink
+            case notDirectory
+            case missing
+            case notAllowed
+            case unreadable(String)
+
+            var message: String {
+                switch self {
+                case .symlink: "symbolic link root refused"
+                case .notDirectory: "not a directory"
+                case .missing: "folder not available"
+                case .notAllowed: "location not allowed"
+                case .unreadable(let detail): detail
+                }
+            }
+        }
+
+        struct RootFailure: Equatable, Sendable {
+            let path: String
+            let issue: RootIssue
+        }
+
+        var attemptedRoots = 0
+        var rootFailures: [RootFailure] = []
+        var skippedItems = 0
+
+        static let none = ScanDiagnostics()
+
+        var hadErrors: Bool { !rootFailures.isEmpty }
+        var readNothing: Bool { attemptedRoots > 0 && rootFailures.count >= attemptedRoots }
+    }
+
     final class ProgressReporter: @unchecked Sendable {
         private let lock = NSLock()
         private let handler: ProgressHandler
@@ -114,50 +148,86 @@ enum DiskScanner {
         customRoot: URL?,
         runningBundleIDs: Set<String>,
         progress: @escaping ProgressHandler
-    ) async -> (items: [ScanItem], root: String) {
+    ) async -> (items: [ScanItem], root: String, diagnostics: ScanDiagnostics) {
         let reporter = ProgressReporter(handler: progress)
 
         switch category {
         case .caches:
-            let items = await scanChildren(
+            let output = await scanChildren(
                 of: userLibrary("Caches"),
+                category: .caches,
                 defaultSelected: true,
                 runningBundleIDs: runningBundleIDs,
                 reporter: reporter
             )
             reporter.flush()
-            return (items, "~/Library/Caches")
+            return (output.items, "~/Library/Caches", output.diagnostics)
         case .logs:
-            let items = await scanChildren(
+            let output = await scanChildren(
                 of: userLibrary("Logs"),
+                category: .logs,
                 defaultSelected: true,
                 runningBundleIDs: runningBundleIDs,
                 reporter: reporter
             )
             reporter.flush()
-            return (items, "~/Library/Logs")
+            return (output.items, "~/Library/Logs", output.diagnostics)
         case .trash:
             let root = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(".Trash", isDirectory: true)
-            let items = await scanChildren(
+            let output = await scanChildren(
                 of: root,
+                category: .trash,
                 defaultSelected: true,
                 runningBundleIDs: [],
                 reporter: reporter
             )
             reporter.flush()
-            return (items, "~/.Trash")
+            return (output.items, "~/.Trash", output.diagnostics)
         case .developer:
-            let items = await scanDeveloperCaches(reporter: reporter)
+            let output = await scanDeveloperCaches(reporter: reporter)
             reporter.flush()
-            return (items, String(localized: "root.developer"))
+            return (output.items, String(localized: "root.developer"), output.diagnostics)
         case .largeFiles:
-            let roots = (customRoot.map { [$0] } ?? defaultLargeFileRoots()).filter(isAllowedLargeFileRoot)
-            let items = scanLargeFiles(roots: roots, threshold: threshold, oldOnly: oldOnly, reporter: reporter)
+            var diagnostics = ScanDiagnostics()
+            let candidates = customRoot.map { [$0] } ?? defaultLargeFileRoots()
+            var roots: [URL] = []
+            for candidate in candidates {
+                diagnostics.attemptedRoots += 1
+                guard isAllowedLargeFileRoot(candidate) else {
+                    diagnostics.rootFailures.append(.init(
+                        path: candidate.path(percentEncoded: false),
+                        issue: .notAllowed
+                    ))
+                    continue
+                }
+                if let failure = rootValidationFailure(for: candidate, missingIsError: customRoot != nil) {
+                    diagnostics.rootFailures.append(failure)
+                    continue
+                }
+                guard FileManager.default.fileExists(atPath: candidate.path(percentEncoded: false)) else { continue }
+                roots.append(candidate)
+            }
+            let items = scanLargeFiles(roots: roots, threshold: threshold, oldOnly: oldOnly, diagnostics: &diagnostics, reporter: reporter)
             reporter.flush()
             let label = customRoot == nil ? String(localized: "root.largeFiles.default") : roots.first?.path(percentEncoded: false) ?? ""
-            return (items, label)
+            return (items, label, diagnostics)
         }
     }
+
+    static func rootValidationFailure(for url: URL, missingIsError: Bool) -> ScanDiagnostics.RootFailure? {
+        let path = url.path(percentEncoded: false)
+        do {
+            let values = try url.resourceValues(forKeys: rootKeys)
+            if values.isSymbolicLink == true { return .init(path: path, issue: .symlink) }
+            if values.isDirectory != true { return .init(path: path, issue: .notDirectory) }
+            return nil
+        } catch {
+            if isMissing(url) { return missingIsError ? .init(path: path, issue: .missing) : nil }
+            return .init(path: path, issue: .unreadable(error.localizedDescription))
+        }
+    }
+
+    private static let rootKeys: Set<URLResourceKey> = [.isDirectoryKey, .isSymbolicLinkKey]
 
     static func size(of url: URL) -> Int64 {
         guard let values = try? url.resourceValues(forKeys: metadataKeys) else { return 0 }
@@ -192,60 +262,90 @@ enum DiskScanner {
 
     private static func scanChildren(
         of root: URL,
+        category: SpaceCategory,
         defaultSelected: Bool,
         runningBundleIDs: Set<String>,
         reporter: ProgressReporter
-    ) async -> [ScanItem] {
+    ) async -> (items: [ScanItem], diagnostics: ScanDiagnostics) {
         let fm = FileManager.default
-        let children = (try? fm.contentsOfDirectory(
-            at: root,
-            includingPropertiesForKeys: childKeyArray,
-            options: []
-        )) ?? []
+        var diagnostics = ScanDiagnostics()
+
+        if let failure = rootValidationFailure(for: root, missingIsError: false) {
+            diagnostics.attemptedRoots = 1
+            diagnostics.rootFailures.append(failure)
+            return ([], diagnostics)
+        }
+        guard !isMissing(root) else {
+            return ([], diagnostics)
+        }
+        diagnostics.attemptedRoots = 1
+
+        let children: [URL]
+        do {
+            children = try fm.contentsOfDirectory(
+                at: root,
+                includingPropertiesForKeys: childKeyArray,
+                options: []
+            )
+        } catch {
+            diagnostics.rootFailures.append(.init(
+                path: root.path(percentEncoded: false),
+                issue: .unreadable(error.localizedDescription)
+            ))
+            return ([], diagnostics)
+        }
 
         let runningTokens = runningTokens(from: runningBundleIDs)
         var slots = [ScanItem?](repeating: nil, count: children.count)
+        var skipped = 0
 
-        await withTaskGroup(of: (Int, ScanItem?).self) { group in
+        await withTaskGroup(of: (Int, ScanItem?, Bool).self) { group in
             var next = 0
             let width = min(maxConcurrentScans, children.count)
             while next < width {
                 let index = next
                 let child = children[index]
                 group.addTask {
-                    (index, scanChild(child, root: root, defaultSelected: defaultSelected, tokens: runningTokens, reporter: reporter))
+                    let outcome = scanChild(child, root: root, category: category, defaultSelected: defaultSelected, tokens: runningTokens, reporter: reporter)
+                    return (index, outcome.item, outcome.failed)
                 }
                 next += 1
             }
-            while let (index, item) = await group.next() {
+            while let (index, item, failed) = await group.next() {
                 slots[index] = item
+                if failed { skipped += 1 }
                 guard !Task.isCancelled, next < children.count else { continue }
                 let index = next
                 let child = children[index]
                 group.addTask {
-                    (index, scanChild(child, root: root, defaultSelected: defaultSelected, tokens: runningTokens, reporter: reporter))
+                    let outcome = scanChild(child, root: root, category: category, defaultSelected: defaultSelected, tokens: runningTokens, reporter: reporter)
+                    return (index, outcome.item, outcome.failed)
                 }
                 next += 1
             }
         }
 
-        return slots.compactMap { $0 }.sorted { $0.size > $1.size }
+        diagnostics.skippedItems = skipped
+        return (slots.compactMap { $0 }.sorted { $0.size > $1.size }, diagnostics)
     }
 
     private static func scanChild(
         _ child: URL,
         root: URL,
+        category: SpaceCategory,
         defaultSelected: Bool,
         tokens: Set<String>,
         reporter: ProgressReporter
-    ) -> ScanItem? {
-        if Task.isCancelled { return nil }
-        guard let values = try? child.resourceValues(forKeys: childKeys) else { return nil }
-        if values.isSymbolicLink == true { return nil }
+    ) -> (item: ScanItem?, failed: Bool) {
+        if Task.isCancelled { return (nil, false) }
+        guard let values = try? child.resourceValues(forKeys: childKeys) else { return (nil, true) }
+        if values.isSymbolicLink == true { return (nil, false) }
 
         let name = child.lastPathComponent
         let safety: ItemSafety
-        if isRunning(name, tokens: tokens) {
+        if let protected = protectedSafety(for: child, category: category) {
+            safety = protected
+        } else if isRunning(name, tokens: tokens) {
             safety = .caution(.appRunning)
         } else {
             safety = .safe
@@ -253,7 +353,7 @@ enum DiskScanner {
 
         let total = size(of: child)
         reporter.add(total)
-        return ScanItem(
+        return (ScanItem(
             url: child,
             root: root,
             size: total,
@@ -261,10 +361,17 @@ enum DiskScanner {
             modified: values.contentModificationDate,
             isSelected: safety.isSafe && defaultSelected,
             safety: safety
-        )
+        ), false)
     }
 
-    private static func scanDeveloperCaches(reporter: ProgressReporter) async -> [ScanItem] {
+    static func protectedSafety(for url: URL, category: SpaceCategory) -> ItemSafety? {
+        guard category != .largeFiles else { return nil }
+        let ext = url.pathExtension.lowercased()
+        guard protectedExtensions.contains(ext) else { return nil }
+        return .protected(ext)
+    }
+
+    private static func scanDeveloperCaches(reporter: ProgressReporter) async -> (items: [ScanItem], diagnostics: ScanDiagnostics) {
         let home = URL(fileURLWithPath: NSHomeDirectory())
         let library = home.appendingPathComponent("Library", isDirectory: true)
         let xcode = library.appendingPathComponent("Developer/Xcode", isDirectory: true)
@@ -293,14 +400,27 @@ enum DiskScanner {
             (home.appendingPathComponent(".cache/huggingface"), .caution(.aiModels))
         ]
 
-        var slots = [ScanItem?](repeating: nil, count: entries.count)
+        var diagnostics = ScanDiagnostics()
+        var candidates: [(URL, ItemSafety)] = []
+        for entry in entries {
+            if let failure = rootValidationFailure(for: entry.0, missingIsError: false) {
+                diagnostics.attemptedRoots += 1
+                diagnostics.rootFailures.append(failure)
+                continue
+            }
+            if isMissing(entry.0) { continue }
+            diagnostics.attemptedRoots += 1
+            candidates.append(entry)
+        }
+
+        var slots = [ScanItem?](repeating: nil, count: candidates.count)
 
         await withTaskGroup(of: (Int, ScanItem?).self) { group in
             var next = 0
-            let width = min(maxConcurrentScans, entries.count)
+            let width = min(maxConcurrentScans, candidates.count)
             while next < width {
                 let index = next
-                let entry = entries[index]
+                let entry = candidates[index]
                 group.addTask {
                     (index, scanDeveloperEntry(entry.0, safety: entry.1, reporter: reporter))
                 }
@@ -308,9 +428,9 @@ enum DiskScanner {
             }
             while let (index, item) = await group.next() {
                 slots[index] = item
-                guard !Task.isCancelled, next < entries.count else { continue }
+                guard !Task.isCancelled, next < candidates.count else { continue }
                 let index = next
-                let entry = entries[index]
+                let entry = candidates[index]
                 group.addTask {
                     (index, scanDeveloperEntry(entry.0, safety: entry.1, reporter: reporter))
                 }
@@ -318,7 +438,7 @@ enum DiskScanner {
             }
         }
 
-        return slots.compactMap { $0 }.sorted { $0.size > $1.size }
+        return (slots.compactMap { $0 }.sorted { $0.size > $1.size }, diagnostics)
     }
 
     private static func scanDeveloperEntry(_ path: URL, safety: ItemSafety, reporter: ProgressReporter) -> ScanItem? {
@@ -346,19 +466,27 @@ enum DiskScanner {
         var visited = 0
         var threshold: Int64 = 0
         var cutoff: Date?
+        var failures: [ScanDiagnostics.RootFailure] = []
+        var skippedDirectories = 0
     }
 
     static func isAllowedLargeFileRoot(_ url: URL) -> Bool {
-        let home = NSHomeDirectory()
-        let path = url.resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false)
-        let forbidden = [
-            home + "/Library", home + "/.Trash",
-            "/System", "/Library", "/Applications", "/private", "/bin", "/usr", "/etc", "/var"
-        ]
-        for base in forbidden where path == base || path.hasPrefix(base + "/") {
-            return false
+        let home = URL(fileURLWithPath: NSHomeDirectory())
+            .resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false)
+        let homePath = foldedPath(home)
+        let path = foldedPath(url.resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false))
+
+        if path == homePath { return false }
+        if isDescendant(path, of: homePath) {
+            return !isForbiddenHomeSubpath(path, home: homePath)
         }
-        return true
+        if path == "/volumes" { return false }
+        return isDescendant(path, of: "/volumes")
+    }
+
+    private static func isForbiddenHomeSubpath(_ path: String, home: String) -> Bool {
+        let forbidden = [home + "/library", home + "/.trash"]
+        return forbidden.contains { path == $0 || path.hasPrefix($0 + "/") }
     }
 
     private static func defaultLargeFileRoots() -> [URL] {
@@ -369,7 +497,13 @@ enum DiskScanner {
             .filter { fm.fileExists(atPath: $0.path(percentEncoded: false)) }
     }
 
-    private static func scanLargeFiles(roots: [URL], threshold: Int64, oldOnly: Bool, reporter: ProgressReporter) -> [ScanItem] {
+    private static func scanLargeFiles(
+        roots: [URL],
+        threshold: Int64,
+        oldOnly: Bool,
+        diagnostics: inout ScanDiagnostics,
+        reporter: ProgressReporter
+    ) -> [ScanItem] {
         var state = LargeScanState()
         state.threshold = threshold
         state.cutoff = oldOnly ? Calendar.current.date(byAdding: .month, value: -6, to: Date()) : nil
@@ -378,6 +512,8 @@ enum DiskScanner {
             if Task.isCancelled { break }
             walkLargeFiles(root, root: root, isRoot: true, state: &state, reporter: reporter)
         }
+        diagnostics.rootFailures.append(contentsOf: state.failures)
+        diagnostics.skippedItems += state.skippedDirectories
         state.found.sort { $0.size > $1.size }
         return Array(state.found.prefix(500))
     }
@@ -392,11 +528,24 @@ enum DiskScanner {
         if Task.isCancelled || state.visited > 4_000_000 { return }
 
         let fm = FileManager.default
-        guard let entries = try? fm.contentsOfDirectory(
-            at: directory,
-            includingPropertiesForKeys: walkKeyArray,
-            options: [.skipsHiddenFiles]
-        ) else { return }
+        let entries: [URL]
+        do {
+            entries = try fm.contentsOfDirectory(
+                at: directory,
+                includingPropertiesForKeys: walkKeyArray,
+                options: [.skipsHiddenFiles]
+            )
+        } catch {
+            if isRoot {
+                state.failures.append(.init(
+                    path: directory.path(percentEncoded: false),
+                    issue: .unreadable(error.localizedDescription)
+                ))
+            } else {
+                state.skippedDirectories += 1
+            }
+            return
+        }
         state.visited += 1
 
         if !isRoot, isProjectFolder(entries) { return }
@@ -514,6 +663,24 @@ enum DiskScanner {
         guard let cutoff else { return true }
         guard let date else { return true }
         return date <= cutoff
+    }
+
+    static func foldedPath(_ path: String) -> String {
+        var folded = path.precomposedStringWithCanonicalMapping
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
+        while folded.count > 1 && folded.hasSuffix("/") {
+            folded.removeLast()
+        }
+        return folded
+    }
+
+    static func isDescendant(_ path: String, of root: String) -> Bool {
+        let base = root.hasSuffix("/") ? root : root + "/"
+        return path != root && path.hasPrefix(base)
+    }
+
+    private static func isMissing(_ url: URL) -> Bool {
+        !FileManager.default.fileExists(atPath: url.path(percentEncoded: false))
     }
 
     private static func allocatedBytes(_ values: URLResourceValues) -> Int64 {

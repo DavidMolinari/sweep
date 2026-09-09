@@ -14,6 +14,8 @@ struct CategoryResult {
     var state: ScanState = .idle
     var scannedAt: Date?
     var rootDescription: String = ""
+    var partialFailure: Bool = false
+    var diagnostics: DiskScanner.ScanDiagnostics = .none
 
     private(set) var totalSize: Int64 = 0
     private(set) var selectedItems: [ScanItem] = []
@@ -66,6 +68,7 @@ struct CleanReport: Identifiable {
     let id = UUID()
     let category: SpaceCategory
     let freed: Int64
+    let movedToTrash: Int64
     let removed: Int
     let failures: [String]
     let permanent: Bool
@@ -102,14 +105,22 @@ final class AppModel: ObservableObject {
 
     private static let freeSpaceKeys: Set<URLResourceKey> = [.volumeAvailableCapacityForImportantUsageKey]
 
-    private var tasks: [SpaceCategory: Task<Void, Never>] = [:]
+    private var scans: [SpaceCategory: (id: UUID, task: Task<Void, Never>)] = [:]
+    private var cleanTasks: [SpaceCategory: Task<Void, Never>] = [:]
+
+    @Published private(set) var cleaningCategories: Set<SpaceCategory> = []
 
     init() {
         let stored = UserDefaults.standard.integer(forKey: Keys.threshold)
         largeThreshold = stored > 0 ? Int64(stored) : 100 * 1024 * 1024
         largeOldOnly = UserDefaults.standard.bool(forKey: Keys.oldOnly)
         if let path = UserDefaults.standard.string(forKey: Keys.root), !path.isEmpty {
-            largeCustomRoot = URL(fileURLWithPath: path)
+            let url = URL(fileURLWithPath: path)
+            if DiskScanner.isAllowedLargeFileRoot(url) {
+                largeCustomRoot = url
+            } else {
+                UserDefaults.standard.removeObject(forKey: Keys.root)
+            }
         }
         if let rawCategory = UserDefaults.standard.string(forKey: Self.defaultCategoryKey),
            let category = SpaceCategory(rawValue: rawCategory) {
@@ -119,7 +130,15 @@ final class AppModel: ObservableObject {
     }
 
     var isAnyScanning: Bool {
-        results.values.contains { $0.state == .scanning }
+        !scans.isEmpty
+    }
+
+    var isAnyCleaning: Bool {
+        !cleaningCategories.isEmpty
+    }
+
+    func isCleaning(_ category: SpaceCategory) -> Bool {
+        cleaningCategories.contains(category)
     }
 
     func result(for category: SpaceCategory) -> CategoryResult {
@@ -141,12 +160,14 @@ final class AppModel: ObservableObject {
     }
 
     func scan(_ category: SpaceCategory) {
-        guard tasks[category] == nil else { return }
+        guard scans[category] == nil else { return }
 
         var placeholder = results[category] ?? CategoryResult()
         placeholder.state = .scanning
         placeholder.replaceItems([])
         placeholder.rootDescription = ""
+        placeholder.partialFailure = false
+        placeholder.diagnostics = .none
         results[category] = placeholder
         liveBytes[category] = 0
 
@@ -155,8 +176,10 @@ final class AppModel: ObservableObject {
         let customRoot = largeCustomRoot
         let runningApps = NSWorkspace.shared.runningApplications
         let runningIdentifiers = Set(runningApps.compactMap(\.bundleIdentifier) + runningApps.compactMap(\.localizedName))
+        let scanID = UUID()
 
-        let task = Task {
+        let task = Task { [weak self] in
+            guard let self else { return }
             let output = await DiskScanner.scan(
                 category: category,
                 threshold: threshold,
@@ -164,31 +187,55 @@ final class AppModel: ObservableObject {
                 customRoot: customRoot,
                 runningBundleIDs: runningIdentifiers
             ) { bytes in
-                Task { @MainActor in
+                Task { @MainActor [weak self] in
+                    guard let self, self.scans[category]?.id == scanID else { return }
                     self.liveBytes[category, default: 0] += bytes
                 }
             }
 
+            guard !Task.isCancelled, self.scans[category]?.id == scanID else { return }
+
             var result = self.results[category] ?? CategoryResult()
-            if Task.isCancelled {
-                result.state = .idle
+            result.diagnostics = output.diagnostics
+            result.rootDescription = output.root
+            if output.diagnostics.readNothing {
+                result.state = .failed(Self.failureMessage(for: output.diagnostics))
+                result.partialFailure = false
                 result.replaceItems([])
-                result.rootDescription = ""
             } else {
                 result.state = .done
+                result.partialFailure = output.diagnostics.hadErrors
                 result.replaceItems(output.items)
                 result.scannedAt = Date()
-                result.rootDescription = output.root
             }
             self.results[category] = result
             self.liveBytes[category] = 0
-            self.tasks[category] = nil
+            self.scans[category] = nil
         }
-        tasks[category] = task
+        scans[category] = (scanID, task)
     }
 
     func cancelScan(_ category: SpaceCategory) {
-        tasks[category]?.cancel()
+        guard let entry = scans[category] else { return }
+        entry.task.cancel()
+        scans[category] = nil
+
+        var result = results[category] ?? CategoryResult()
+        result.state = .idle
+        result.replaceItems([])
+        result.rootDescription = ""
+        result.partialFailure = false
+        result.diagnostics = .none
+        results[category] = result
+        liveBytes[category] = 0
+    }
+
+    private static func failureMessage(for diagnostics: DiskScanner.ScanDiagnostics) -> String {
+        let lines = diagnostics.rootFailures.prefix(3).map { failure in
+            "\(failure.path): \(failure.issue.message)"
+        }
+        let suffix = diagnostics.rootFailures.count > 3 ? "\n…" : ""
+        return lines.joined(separator: "\n") + suffix
     }
 
     func rescanIfDone(_ category: SpaceCategory) {
@@ -211,19 +258,17 @@ final class AppModel: ObservableObject {
 
     func toggleSelectAll(in category: SpaceCategory) {
         guard var result = results[category], !result.items.isEmpty else { return }
-        let selectable = result.items.filter(\.safety.isSelectable)
-        let allSelected = !selectable.isEmpty && selectable.allSatisfy(\.isSelected)
+        let safe = result.items.filter(\.safety.isSafe)
+        let allSafeSelected = !safe.isEmpty && safe.allSatisfy(\.isSelected)
 
         result.mutateItems { items in
             for index in items.indices {
-                guard items[index].safety.isSelectable else {
-                    items[index].isSelected = false
-                    continue
-                }
-                if allSelected {
-                    items[index].isSelected = false
-                } else {
-                    items[index].isSelected = items[index].safety.isSafe
+                if allSafeSelected {
+                    if items[index].safety.isSelectable {
+                        items[index].isSelected = false
+                    }
+                } else if items[index].safety.isSafe {
+                    items[index].isSelected = true
                 }
             }
         }
@@ -231,6 +276,7 @@ final class AppModel: ObservableObject {
     }
 
     func requestClean(_ category: SpaceCategory) {
+        guard !isCleaning(category) else { return }
         let items = result(for: category).selectedItems
         guard !items.isEmpty else { return }
         confirmation = PendingClean(category: category, items: items)
@@ -238,28 +284,41 @@ final class AppModel: ObservableObject {
 
     func performClean(_ pending: PendingClean) {
         confirmation = nil
-        let items = pending.items
         let category = pending.category
+        let items = pending.items
+        guard !items.isEmpty, cleanTasks[category] == nil else { return }
 
-        Task {
+        cleaningCategories.insert(category)
+        let task = Task.detached(priority: .userInitiated) { [weak self] in
             let outcome = Cleaner.clean(items: items, category: category)
-            if Task.isCancelled { return }
-
-            if var result = self.results[category] {
-                result.removeItems(withIDs: Set(outcome.removedIDs))
-                self.results[category] = result
-            }
-
-            try? await Task.sleep(nanoseconds: 350_000_000)
-            self.report = CleanReport(
-                category: category,
-                freed: outcome.freed,
-                removed: outcome.removedIDs.count,
-                failures: outcome.failures,
-                permanent: outcome.permanent
-            )
-            self.refreshFreeSpace()
+            await self?.completeClean(category: category, outcome: outcome)
         }
+        cleanTasks[category] = task
+    }
+
+    func cancelClean(_ category: SpaceCategory) {
+        cleanTasks[category]?.cancel()
+    }
+
+    private func completeClean(category: SpaceCategory, outcome: Cleaner.Report) async {
+        cleanTasks[category] = nil
+        cleaningCategories.remove(category)
+
+        if var result = results[category] {
+            result.removeItems(withIDs: Set(outcome.removedIDs))
+            results[category] = result
+        }
+
+        try? await Task.sleep(for: .milliseconds(350))
+        report = CleanReport(
+            category: category,
+            freed: outcome.freed,
+            movedToTrash: outcome.movedToTrash,
+            removed: outcome.removedIDs.count,
+            failures: outcome.failures,
+            permanent: outcome.permanent
+        )
+        refreshFreeSpace()
     }
 
     func chooseLargeFilesFolder() {

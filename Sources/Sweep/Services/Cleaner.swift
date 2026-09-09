@@ -21,9 +21,10 @@ enum Cleaner {
         }
     }
 
-    struct Report {
+    struct Report: Sendable {
         var removedIDs: [UUID] = []
         var freed: Int64 = 0
+        var movedToTrash: Int64 = 0
         var failures: [String] = []
         var permanent = false
     }
@@ -48,15 +49,18 @@ enum Cleaner {
                 continue
             }
 
+            let measured = measuredSize(of: item)
+
             do {
                 if report.permanent {
                     try fm.removeItem(at: item.url)
                 } else {
                     var resulting: NSURL?
                     try fm.trashItem(at: item.url, resultingItemURL: &resulting)
+                    report.movedToTrash += measured
                 }
                 report.removedIDs.append(item.id)
-                report.freed += item.size
+                report.freed += measured
             } catch {
                 report.failures.append(failureLine(item.name, error.localizedDescription))
             }
@@ -64,25 +68,35 @@ enum Cleaner {
         return report
     }
 
+    private static func measuredSize(of item: ScanItem) -> Int64 {
+        let measured = DiskScanner.size(of: item.url)
+        return measured > 0 ? measured : item.size
+    }
+
     private static func failureLine(_ name: String, _ reason: String) -> String {
         String(localized: "clean.failure.reason \(name) \(reason)")
     }
 
+    private static func fold(_ path: String) -> String {
+        DiskScanner.foldedPath(path)
+    }
+
     private static let forbiddenPaths: Set<String> = {
         let home = NSHomeDirectory()
-        return [
+        return Set([
             "/", home, home + "/Library", home + "/Documents", home + "/Desktop",
             home + "/Downloads", home + "/Projects", home + "/Movies", home + "/Music",
             home + "/Pictures", home + "/.Trash", "/Applications", "/System", "/Library",
-            "/Users", "/private", "/bin", "/sbin", "/usr", "/etc", "/var", "/opt"
-        ]
+            "/Users", "/private", "/bin", "/sbin", "/usr", "/etc", "/var", "/opt",
+            "/Volumes", "/dev", "/home", "/Network", "/cores", "/tmp"
+        ].map(fold))
     }()
 
     private static let forbiddenPrefixes: [String] = {
         let home = NSHomeDirectory()
         return [
             "/System/", "/Library/", "/Applications/", "/private/", "/usr/", "/bin/",
-            "/sbin/", "/etc/", "/var/", "/opt/",
+            "/sbin/", "/etc/", "/var/", "/opt/", "/dev/",
             home + "/Library/Containers/",
             home + "/Library/Group Containers/",
             home + "/Library/Application Support/",
@@ -96,20 +110,23 @@ enum Cleaner {
             home + "/Library/Contacts/",
             home + "/Library/Mobile Documents/",
             home + "/Library/CloudStorage/"
-        ]
+        ].map(fold)
     }()
 
     private static let symlinkKeys: Set<URLResourceKey> = [.isSymbolicLinkKey]
 
-    private static func refusalReason(for item: ScanItem, category: SpaceCategory) -> RefusalReason? {
+    static func refusalReason(for item: ScanItem, category: SpaceCategory) -> RefusalReason? {
         let url = item.url
 
-        let isSymlink = (try? url.resourceValues(forKeys: symlinkKeys))?.isSymbolicLink
-        if isSymlink == true { return .symlink }
+        guard let isSymlink = (try? url.resourceValues(forKeys: symlinkKeys))?.isSymbolicLink else {
+            return .invalidPath
+        }
+        if isSymlink { return .symlink }
 
-        let path = url.standardizedFileURL.path(percentEncoded: false)
-        let resolvedPath = url.resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false)
-        let resolvedRoot = item.root.resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false)
+        let path = fold(url.standardizedFileURL.path(percentEncoded: false))
+        let resolvedPath = fold(url.resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false))
+        let rootPath = fold(item.root.standardizedFileURL.path(percentEncoded: false))
+        let resolvedRoot = fold(item.root.resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false))
 
         guard url.pathComponents.count >= 4 else { return .invalidPath }
         if forbiddenPaths.contains(path) || forbiddenPaths.contains(resolvedPath) { return .protectedLocation }
@@ -117,16 +134,22 @@ enum Cleaner {
             return .protectedLocation
         }
 
+        guard resolvedRoot == rootPath else { return .symlink }
         guard isDescendant(resolvedPath, of: resolvedRoot) else { return .outsideScan }
 
         if category == .trash {
-            let trashRoot = URL(fileURLWithPath: NSHomeDirectory())
+            let trashURL = URL(fileURLWithPath: NSHomeDirectory())
                 .appendingPathComponent(".Trash", isDirectory: true)
-                .resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false)
-            guard isDescendant(resolvedPath, of: trashRoot) else { return .outsideTrash }
+            let trashPath = fold(trashURL.standardizedFileURL.path(percentEncoded: false))
+            let resolvedTrash = fold(trashURL.resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false))
+            guard trashPath == resolvedTrash else { return .outsideTrash }
+            guard isDescendant(path, of: trashPath) else { return .outsideTrash }
+            guard isDescendant(resolvedPath, of: resolvedTrash) else { return .outsideTrash }
+        } else if category == .largeFiles {
+            guard DiskScanner.isAllowedLargeFileRoot(item.root) else { return .unauthorizedRoot }
         } else {
-            let home = URL(fileURLWithPath: NSHomeDirectory())
-                .resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false)
+            let home = fold(URL(fileURLWithPath: NSHomeDirectory())
+                .resolvingSymlinksInPath().standardizedFileURL.path(percentEncoded: false))
             guard isDescendant(resolvedRoot, of: home) else { return .unauthorizedRoot }
         }
 
