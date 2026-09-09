@@ -54,6 +54,11 @@
 "status.scanning" = "Scan läuft…";
 "status.scanned %@" = "%@ geprüft";
 
+"a11y.selected" = "Ausgewählt";
+"a11y.notSelected" = "Nicht ausgewählt";
+"a11y.protected" = "Geschützt";
+"a11y.toggle.hint" = "Markiert dieses Objekt für die Bereinigung oder hebt die Markierung auf";
+
 "detail.emptySelection" = "Kategorie auswählen";
 
 "items.count.one %lld" = "%lld Objekt";
@@ -74,9 +79,12 @@
 "cleanbar.emptyTrash.help" = "Löscht den Inhalt des Papierkorbs endgültig";
 "cleanbar.selectAll.help" = "Wählt alle Objekte aus";
 "cleanbar.selectAll.warningHelp" = "„Alle auswählen“ markiert nur Objekte ohne Warnung";
+"cleanbar.selectSafe" = "Sichere Objekte markieren";
+"cleanbar.selectAll.warningNote" = "Markierte Objekte bleiben unmarkiert";
 "cleanbar.flagged.help" = "Objekte, die vorsichtshalber abgewählt wurden (laufende App, Archiv, Datenbank…) – vor der Auswahl prüfen";
 "cleanbar.flagged.hideHelp" = "Alle Elemente erneut anzeigen";
 "filter.all %lld" = "Alle (%lld)";
+"filter.title" = "Anzeigen";
 "filter.runningHint" = "Beenden Sie die laufenden Apps und scannen Sie erneut";
 
 "confirm.title.clean" = "Diese Dateien bereinigen?";
@@ -93,8 +101,10 @@
 "empty.nothingToClean.title" = "Nichts zu bereinigen";
 "empty.nothingToClean.message" = "In dieser Kategorie wurden keine Objekte gefunden.";
 "empty.notScanned.title" = "Noch kein Scan";
+"empty.notScanned.message" = "Markierte Objekte werden in den Papierkorb verschoben – nichts wird gelöscht, außer Sie leeren den Papierkorb.";
 
 "failure.title" = "Scan fehlgeschlagen";
+"scan.partial.title" = "Einige Speicherorte wurden übersprungen";
 
 "largeFiles.minSize" = "Mindestgröße";
 "largeFiles.olderThan6Months" = "Vor mehr als 6 Monaten geändert";

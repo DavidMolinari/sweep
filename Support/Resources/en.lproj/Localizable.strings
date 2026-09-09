@@ -54,6 +54,11 @@
 "status.scanning" = "Scanning…";
 "status.scanned %@" = "%@ checked";
 
+"a11y.selected" = "Selected";
+"a11y.notSelected" = "Not selected";
+"a11y.protected" = "Protected";
+"a11y.toggle.hint" = "Toggles selection for cleanup";
+
 "detail.emptySelection" = "Select a category";
 
 "items.count.one %lld" = "%lld item";
@@ -74,9 +79,12 @@
 "cleanbar.emptyTrash.help" = "Permanently delete the Trash contents";
 "cleanbar.selectAll.help" = "Selects all items";
 "cleanbar.selectAll.warningHelp" = "“Select All” only checks items without a warning";
+"cleanbar.selectSafe" = "Select Safe Items";
+"cleanbar.selectAll.warningNote" = "Flagged items stay unchecked";
 "cleanbar.flagged.help" = "Items unchecked for safety (running app, archive, database…) — review before selecting";
 "cleanbar.flagged.hideHelp" = "Show all items again";
 "filter.all %lld" = "All (%lld)";
+"filter.title" = "Show";
 "filter.runningHint" = "Quit the running apps, then rescan";
 
 "confirm.title.clean" = "Clean these files?";
@@ -93,8 +101,10 @@
 "empty.nothingToClean.title" = "Nothing to clean";
 "empty.nothingToClean.message" = "No items found in this category.";
 "empty.notScanned.title" = "No scan yet";
+"empty.notScanned.message" = "Checked items are moved to the Trash — nothing is erased, except when you empty the Trash.";
 
 "failure.title" = "Scan failed";
+"scan.partial.title" = "Some locations were skipped";
 
 "largeFiles.minSize" = "Minimum size";
 "largeFiles.olderThan6Months" = "Modified more than 6 months ago";

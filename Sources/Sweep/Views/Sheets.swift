@@ -53,12 +53,12 @@ struct ConfirmCleanView: View {
                 .buttonBorderShape(.capsule)
                 .controlSize(.large)
                 .tint(permanent ? .red : .accentColor)
-                .keyboardShortcut(.defaultAction)
+                .keyboardShortcut(permanent ? nil : .defaultAction)
             }
             .padding(.top, 2)
         }
         .padding(26)
-        .frame(width: 450)
+        .frame(minWidth: 420, maxWidth: 450)
     }
 }
 

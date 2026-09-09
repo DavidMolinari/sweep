@@ -33,7 +33,7 @@ struct SidebarFooter: View {
                         .foregroundStyle(.secondary)
                         .frame(width: 24, height: 24)
                         .background {
-                            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                            RoundedRectangle(cornerRadius: BrandPalette.Radius.inset, style: .continuous)
                                 .fill(Color.primary.opacity(0.06))
                         }
                     Text(model.freeSpace.map { String(localized: "sidebar.freeSpace \($0.formatted(.byteCount(style: .file)))") } ?? String(localized: "sidebar.freeSpace.unavailable"))
@@ -55,12 +55,12 @@ struct SidebarFooter: View {
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .background(.ultraThinMaterial)
     }
 }
 
 struct SidebarRow: View {
     @EnvironmentObject private var model: AppModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let category: SpaceCategory
 
     var body: some View {
@@ -90,8 +90,8 @@ struct SidebarRow: View {
                     .font(.caption.weight(.medium))
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
-                    .contentTransition(.numericText())
-                    .animation(.snappy, value: result.totalSize)
+                    .contentTransition(reduceMotion ? .identity : .numericText())
+                    .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: result.totalSize)
             }
         }
         .padding(.vertical, 3)

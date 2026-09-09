@@ -16,7 +16,7 @@ struct EmptyStateView: View {
             VStack(spacing: 6) {
                 Text(alreadyScanned ? "empty.nothingToClean.title" : "empty.notScanned.title")
                     .font(.title3.weight(.semibold))
-                Text(alreadyScanned ? String(localized: "empty.nothingToClean.message") : category.subtitle)
+                Text(alreadyScanned ? String(localized: "empty.nothingToClean.message") : String(localized: "empty.notScanned.message"))
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -36,6 +36,7 @@ struct EmptyStateView: View {
 }
 
 struct ScanningView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let category: SpaceCategory
     let liveBytes: Int64
     let cancel: () -> Void
@@ -57,12 +58,13 @@ struct ScanningView: View {
                     .font(.callout)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
-                    .contentTransition(.numericText(value: Double(liveBytes)))
-                    .animation(.easeOut(duration: 0.25), value: liveBytes)
+                    .contentTransition(reduceMotion ? .identity : .numericText(value: Double(liveBytes)))
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.22), value: liveBytes)
             }
 
             Button("action.cancel", action: cancel)
                 .controlSize(.large)
+                .keyboardShortcut(.cancelAction)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -90,9 +92,57 @@ struct FailureView: View {
                 .buttonStyle(.borderedProminent)
                 .buttonBorderShape(.capsule)
                 .controlSize(.large)
-                .tint(.orange)
+                .tint(BrandPalette.Semantic.caution)
                 .padding(.top, 2)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+struct PartialScanBanner: View {
+    @EnvironmentObject private var model: AppModel
+    let message: String
+    let retry: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(BrandPalette.Semantic.caution)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("scan.partial.title")
+                    .font(.caption.weight(.semibold))
+                if !message.isEmpty {
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+            }
+
+            Spacer(minLength: 8)
+
+            Button("settings.storage.fullDiskAccess.open") {
+                model.openFullDiskAccessSettings()
+            }
+            .controlSize(.small)
+
+            Button("action.retry", action: retry)
+                .controlSize(.small)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background {
+            RoundedRectangle(cornerRadius: BrandPalette.Radius.chip, style: .continuous)
+                .fill(BrandPalette.Semantic.caution.opacity(0.10))
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: BrandPalette.Radius.chip, style: .continuous)
+                .strokeBorder(BrandPalette.Semantic.caution.opacity(0.25), lineWidth: 0.8)
+        }
+        .padding(.horizontal, 14)
+        .padding(.bottom, 8)
+        .accessibilityElement(children: .combine)
     }
 }

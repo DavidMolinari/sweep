@@ -12,7 +12,7 @@ struct LargeFilesControls: View {
                 Text("size.250mb").tag(Int64(250 * 1024 * 1024))
                 Text("size.500mb").tag(Int64(500 * 1024 * 1024))
             }
-            .frame(width: 190)
+            .frame(minWidth: 170, idealWidth: 200)
 
             Toggle("largeFiles.olderThan6Months", isOn: $model.largeOldOnly)
                 .toggleStyle(.checkbox)
@@ -37,6 +37,7 @@ struct LargeFilesControls: View {
                 }
                 .buttonStyle(.plain)
                 .help("largeFiles.resetRoot.help")
+                .accessibilityLabel("largeFiles.resetRoot.help")
             }
 
             Button("action.scan") {
@@ -45,16 +46,10 @@ struct LargeFilesControls: View {
             .buttonStyle(.bordered)
             .disabled(model.isAnyScanning)
         }
+        .disabled(model.isAnyScanning)
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.ultraThinMaterial)
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.06), lineWidth: 0.8)
-        }
+        .contentSurface(cornerRadius: BrandPalette.Radius.field)
         .padding(.horizontal, 14)
         .padding(.bottom, 10)
         .onChange(of: model.largeThreshold) { _, _ in

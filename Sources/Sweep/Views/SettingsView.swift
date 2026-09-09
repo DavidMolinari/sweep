@@ -2,18 +2,27 @@ import AppKit
 import SwiftUI
 
 struct SettingsView: View {
+    private enum Tab: String {
+        case general
+        case largeFiles
+        case storage
+    }
+
+    @AppStorage("settings.selectedTab") private var selectedTab: Tab = .general
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             GeneralSettingsPane()
                 .tabItem { Label("settings.tab.general", systemImage: "gearshape") }
+                .tag(Tab.general)
             LargeFilesSettingsPane()
                 .tabItem { Label("settings.tab.largeFiles", systemImage: "scalemass") }
+                .tag(Tab.largeFiles)
             StorageSettingsPane()
                 .tabItem { Label("settings.tab.storage", systemImage: "internaldrive") }
-            AboutSettingsPane()
-                .tabItem { Label("settings.tab.about", systemImage: "info.circle") }
+                .tag(Tab.storage)
         }
-        .frame(width: 560, height: 430)
+        .frame(minWidth: 540, idealWidth: 560, minHeight: 420, idealHeight: 430)
     }
 }
 
@@ -187,51 +196,5 @@ private struct StorageSettingsPane: View {
     private var freeSpaceDescription: String {
         model.freeSpace.map { $0.formatted(.byteCount(style: .file)) }
             ?? String(localized: "settings.storage.freeSpace.unavailable")
-    }
-}
-
-private struct AboutSettingsPane: View {
-    @State private var showingLicense = false
-
-    var body: some View {
-        Form {
-            Section {
-                HStack(spacing: 14) {
-                    Image(nsImage: AppInfo.icon)
-                        .resizable()
-                        .frame(width: 48, height: 48)
-                        .accessibilityHidden(true)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(verbatim: "Sweep")
-                            .font(.headline)
-                        Text("about.builtWith")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                LabeledContent("settings.about.version") {
-                    Text(verbatim: AppInfo.version)
-                        .monospacedDigit()
-                }
-                LabeledContent("settings.about.license") {
-                    Text(verbatim: "MIT")
-                }
-                Link(destination: AppInfo.githubURL) {
-                    Label("settings.about.github", systemImage: "arrow.up.right.square")
-                }
-            }
-            Section {
-                Button("about.viewLicense") {
-                    showingLicense = true
-                }
-                Text("about.copyright")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .formStyle(.grouped)
-        .sheet(isPresented: $showingLicense) {
-            MITLicenseSheet()
-        }
     }
 }

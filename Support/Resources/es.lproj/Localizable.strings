@@ -54,6 +54,11 @@
 "status.scanning" = "Analizando…";
 "status.scanned %@" = "%@ analizados";
 
+"a11y.selected" = "Seleccionado";
+"a11y.notSelected" = "No seleccionado";
+"a11y.protected" = "Protegido";
+"a11y.toggle.hint" = "Marca o desmarca este elemento para la limpieza";
+
 "detail.emptySelection" = "Selecciona una categoría";
 
 "items.count.one %lld" = "%lld elemento";
@@ -74,9 +79,12 @@
 "cleanbar.emptyTrash.help" = "Elimina definitivamente el contenido de la Papelera";
 "cleanbar.selectAll.help" = "Selecciona todos los elementos";
 "cleanbar.selectAll.warningHelp" = "«Seleccionar todo» solo marca los elementos sin advertencia";
+"cleanbar.selectSafe" = "Seleccionar elementos seguros";
+"cleanbar.selectAll.warningNote" = "Los elementos marcados permanecen sin marcar";
 "cleanbar.flagged.help" = "Elementos desmarcados por precaución (app en ejecución, archivo, base de datos…) — revísalos antes de seleccionarlos";
 "cleanbar.flagged.hideHelp" = "Mostrar de nuevo todos los elementos";
 "filter.all %lld" = "Todo (%lld)";
+"filter.title" = "Mostrar";
 "filter.runningHint" = "Cierra las aplicaciones en ejecución y vuelve a analizar";
 
 "confirm.title.clean" = "¿Limpiar estos archivos?";
@@ -93,8 +101,10 @@
 "empty.nothingToClean.title" = "Nada que limpiar";
 "empty.nothingToClean.message" = "No se detectaron elementos en esta categoría.";
 "empty.notScanned.title" = "Aún no hay análisis";
+"empty.notScanned.message" = "Los elementos marcados se mueven a la Papelera: no se borra nada, salvo cuando vacías la Papelera.";
 
 "failure.title" = "No se pudo analizar";
+"scan.partial.title" = "Se han omitido algunas ubicaciones";
 
 "largeFiles.minSize" = "Tamaño mínimo";
 "largeFiles.olderThan6Months" = "Modificados hace más de 6 meses";

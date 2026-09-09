@@ -105,6 +105,8 @@ extension BrandPalette {
         )
 
         static let danger = Category.trash
+
+        static let caution = adaptive(0xB45309, 0xFF9F0A)
     }
 
     enum Radius {

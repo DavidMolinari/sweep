@@ -104,10 +104,10 @@ struct AboutView: View {
     private func copyVersion() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString("Sweep \(AppInfo.version)", forType: .string)
-        withAnimation(.snappy) { copied = true }
+        withAnimation(.snappy(duration: 0.2)) { copied = true }
         Task {
             try? await Task.sleep(nanoseconds: 1_600_000_000)
-            withAnimation(.snappy) { copied = false }
+            withAnimation(.snappy(duration: 0.2)) { copied = false }
         }
     }
 }

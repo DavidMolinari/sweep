@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CategoryDetailView: View {
     @EnvironmentObject private var model: AppModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let category: SpaceCategory
 
     @State private var showOnlyFlagged = false
@@ -40,7 +41,7 @@ struct CategoryDetailView: View {
         }
         .background(detailWash)
         .navigationTitle(category.title)
-        .animation(.easeInOut(duration: 0.22), value: result.state)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: result.state)
     }
 
     private var detailWash: some View {
@@ -73,8 +74,17 @@ struct CategoryDetailView: View {
                 ItemListView(category: category, items: items)
             }
         case .failed(let message):
-            FailureView(message: message) {
-                model.scan(category)
+            if result.items.isEmpty {
+                FailureView(message: message) {
+                    model.scan(category)
+                }
+            } else {
+                VStack(spacing: 0) {
+                    PartialScanBanner(message: message) {
+                        model.scan(category)
+                    }
+                    ItemListView(category: category, items: items)
+                }
             }
         }
     }
@@ -95,6 +105,7 @@ struct FlaggedFilterBar: View {
             }
             .pickerStyle(.segmented)
             .labelsHidden()
+            .accessibilityLabel(Text("filter.title"))
             .frame(maxWidth: 320)
 
             if showOnlyFlagged, runningCount > 0 {
@@ -118,6 +129,10 @@ struct FlaggedFilterBar: View {
 }
 
 struct CategoryHeader: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ScaledMetric(relativeTo: .title2) private var liveCounterSize: CGFloat = 24
+    @ScaledMetric(relativeTo: .largeTitle) private var totalCounterSize: CGFloat = 30
+
     let category: SpaceCategory
     let result: CategoryResult
     let liveBytes: Int64
@@ -134,15 +149,11 @@ struct CategoryHeader: View {
             }
             .frame(width: 72, height: 72)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(category.title)
-                    .font(.system(.title2, weight: .semibold))
-                Text(result.rootDescription.isEmpty ? category.subtitle : result.rootDescription)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-            }
+            Text(result.rootDescription.isEmpty ? category.subtitle : result.rootDescription)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .truncationMode(.middle)
 
             Spacer(minLength: 12)
 
@@ -150,17 +161,7 @@ struct CategoryHeader: View {
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
-        .glassSurface(cornerRadius: 18)
-        .background {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [style.colors[0].opacity(0.16), style.colors[1].opacity(0.03)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        }
+        .contentSurface()
         .padding(.horizontal, 14)
         .padding(.top, 12)
         .padding(.bottom, 10)
@@ -171,10 +172,10 @@ struct CategoryHeader: View {
         if result.state == .scanning {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(liveBytes.formatted(.byteCount(style: .file)))
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
+                    .font(.system(size: liveCounterSize, weight: .semibold, design: .rounded))
                     .monospacedDigit()
-                    .contentTransition(.numericText(value: Double(liveBytes)))
-                    .animation(.easeOut(duration: 0.25), value: liveBytes)
+                    .contentTransition(reduceMotion ? .identity : .numericText(value: Double(liveBytes)))
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.22), value: liveBytes)
                 Text("status.scanning")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -182,10 +183,10 @@ struct CategoryHeader: View {
         } else if !result.items.isEmpty {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(result.totalSize.formatted(.byteCount(style: .file)))
-                    .font(.system(size: 30, weight: .semibold, design: .rounded))
+                    .font(.system(size: totalCounterSize, weight: .semibold, design: .rounded))
                     .monospacedDigit()
-                    .contentTransition(.numericText(value: Double(result.totalSize)))
-                    .animation(.snappy, value: result.totalSize)
+                    .contentTransition(reduceMotion ? .identity : .numericText(value: Double(result.totalSize)))
+                    .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: result.totalSize)
                 Text(itemCountLabel(result.items.count))
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -220,6 +221,7 @@ struct ItemListView: View {
 
 struct ItemRow: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let item: ScanItem
     let toggle: () -> Void
 
@@ -246,8 +248,8 @@ struct ItemRow: View {
                             Text(reason.message)
                                 .lineLimit(2)
                         }
-                        .font(.caption2)
-                        .foregroundStyle(.orange)
+                        .font(.caption)
+                        .foregroundStyle(BrandPalette.Semantic.caution)
                     }
                 }
 
@@ -258,7 +260,7 @@ struct ItemRow: View {
                 if let modified = item.modified {
                     Text(modified, format: .dateTime.day().month().year())
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                         .monospacedDigit()
                         .frame(minWidth: 88, alignment: .trailing)
                 }
@@ -272,29 +274,73 @@ struct ItemRow: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                RoundedRectangle(cornerRadius: BrandPalette.Radius.chip, style: .continuous)
                     .fill(backgroundFill)
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .disabled(!item.safety.isSelectable)
-        .opacity(item.safety.isSelectable ? 1 : 0.72)
         .onHover { hovering in
-            withAnimation(.easeOut(duration: 0.14)) {
+            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.14)) {
                 isHovering = hovering
             }
         }
-        .animation(.easeOut(duration: 0.18), value: item.isSelected)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.18), value: item.isSelected)
         .contextMenu {
             Button("action.revealInFinder") {
-                NSWorkspace.shared.activateFileViewerSelecting([item.url])
+                revealInFinder()
             }
             Button("action.copyPath") {
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(item.path, forType: .string)
+                copyPath()
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(item.name))
+        .accessibilityValue(Text(accessibilityValueText))
+        .accessibilityHint(Text(accessibilityHintText))
+        .accessibilityAddTraits(item.isSelected ? .isSelected : [])
+        .accessibilityAction(named: Text("action.revealInFinder")) {
+            revealInFinder()
+        }
+        .accessibilityAction(named: Text("action.copyPath")) {
+            copyPath()
+        }
+    }
+
+    private var accessibilityValueText: String {
+        var parts: [String] = []
+        if item.safety.isProtected {
+            parts.append(String(localized: "a11y.protected"))
+        } else {
+            parts.append(item.isSelected ? String(localized: "a11y.selected") : String(localized: "a11y.notSelected"))
+            if item.safety.warning != nil {
+                parts.append(String(localized: "safety.caution.label"))
+            }
+        }
+        parts.append(item.size.formatted(.byteCount(style: .file)))
+        if let modified = item.modified {
+            parts.append(modified.formatted(.dateTime.day().month().year()))
+        }
+        return parts.joined(separator: ", ")
+    }
+
+    private var accessibilityHintText: String {
+        if item.safety.isProtected {
+            return String(localized: "safety.protected.help")
+        }
+        if let warning = item.safety.warning {
+            return warning
+        }
+        return String(localized: "a11y.toggle.hint")
+    }
+
+    private func revealInFinder() {
+        NSWorkspace.shared.activateFileViewerSelecting([item.url])
+    }
+
+    private func copyPath() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(item.path, forType: .string)
     }
 
     private var checkbox: some View {
@@ -304,7 +350,7 @@ struct ItemRow: View {
                     Circle()
                         .fill(item.isSelected ? Color.accentColor : Color.clear)
                     Circle()
-                        .strokeBorder(item.isSelected ? Color.clear : Color.secondary.opacity(0.45), lineWidth: 1.5)
+                        .strokeBorder(item.isSelected ? Color.clear : Color.secondary, lineWidth: 1.5)
                     if item.isSelected {
                         Image(systemName: "checkmark")
                             .font(.system(size: 10, weight: .bold))
@@ -321,7 +367,8 @@ struct ItemRow: View {
             }
         }
         .frame(width: 20, height: 20)
-        .animation(.spring(response: 0.28, dampingFraction: 0.65), value: item.isSelected)
+        .animation(reduceMotion ? nil : .spring(response: 0.22, dampingFraction: 0.7), value: item.isSelected)
+        .accessibilityHidden(true)
     }
 
     @ViewBuilder
@@ -335,17 +382,17 @@ struct ItemRow: View {
                     Circle().fill(Color.primary.opacity(0.07))
                 }
                 .help("safety.protected.help")
-                .accessibilityLabel("safety.protected.label")
+                .accessibilityHidden(true)
         } else if let warning = item.safety.warning {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.orange)
+                .foregroundStyle(BrandPalette.Semantic.caution)
                 .frame(width: 22, height: 22)
                 .background {
-                    Circle().fill(Color.orange.opacity(0.15))
+                    Circle().fill(BrandPalette.Semantic.caution.opacity(0.16))
                 }
                 .help(warning)
-                .accessibilityLabel("safety.caution.label")
+                .accessibilityHidden(true)
         }
     }
 
@@ -362,21 +409,29 @@ struct ItemRow: View {
 
 struct CleanBar: View {
     @EnvironmentObject private var model: AppModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let category: SpaceCategory
     let result: CategoryResult
     let flaggedCount: Int
     @Binding var showOnlyFlagged: Bool
 
-    var body: some View {
+    private var allSelected: Bool {
         let selectable = result.items.filter(\.safety.isSelectable)
-        let allSelected = !selectable.isEmpty && selectable.allSatisfy(\.isSelected)
+        return !selectable.isEmpty && selectable.allSatisfy(\.isSelected)
+    }
 
+    private var selectAllTitle: LocalizedStringKey {
+        if allSelected { return "action.deselectAll" }
+        return flaggedCount > 0 ? "cleanbar.selectSafe" : "action.selectAll"
+    }
+
+    var body: some View {
         VStack(spacing: 0) {
             Divider()
                 .opacity(0.5)
             HStack(spacing: 12) {
                 if !result.items.isEmpty {
-                    Button(allSelected ? "action.deselectAll" : "action.selectAll") {
+                    Button(selectAllTitle) {
                         model.toggleSelectAll(in: category)
                     }
                     .controlSize(.large)
@@ -385,17 +440,24 @@ struct CleanBar: View {
                           : "cleanbar.selectAll.help")
                 }
 
+                if flaggedCount > 0 && !allSelected {
+                    Text("cleanbar.selectAll.warningNote")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+
                 if flaggedCount > 0 {
                     Button {
                         showOnlyFlagged.toggle()
                     } label: {
                         Label(L10n.flaggedCount(flaggedCount), systemImage: "exclamationmark.triangle.fill")
                             .font(.callout.weight(.medium))
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(BrandPalette.Semantic.caution)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
                             .background {
-                                Capsule().fill(Color.orange.opacity(showOnlyFlagged ? 0.28 : 0.14))
+                                Capsule().fill(BrandPalette.Semantic.caution.opacity(showOnlyFlagged ? 0.28 : 0.15))
                             }
                     }
                     .buttonStyle(.plain)
@@ -414,8 +476,8 @@ struct CleanBar: View {
                         .background {
                             Capsule().fill(Color.primary.opacity(0.05))
                         }
-                        .contentTransition(.numericText())
-                        .animation(.snappy, value: result.selectedSize)
+                        .contentTransition(reduceMotion ? .identity : .numericText())
+                        .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: result.selectedSize)
                 }
 
                 Button {

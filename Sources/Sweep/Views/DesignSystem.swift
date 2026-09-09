@@ -117,6 +117,7 @@ struct SpinningRing: View {
     var lineWidth: CGFloat = 2.5
     let gradient: AngularGradient
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var spinning = false
 
     var body: some View {
@@ -127,10 +128,17 @@ struct SpinningRing: View {
                 .trim(from: 0, to: 0.30)
                 .stroke(gradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(spinning ? 360 : 0))
-                .animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: spinning)
+                .animation(
+                    reduceMotion ? nil : .linear(duration: 0.9).repeatForever(autoreverses: false),
+                    value: spinning
+                )
         }
         .frame(width: size, height: size)
-        .onAppear { spinning = true }
+        .onAppear {
+            if !reduceMotion {
+                spinning = true
+            }
+        }
     }
 }
 
@@ -174,8 +182,28 @@ private struct GlassSurfaceModifier: ViewModifier {
     }
 }
 
+private struct ContentSurfaceModifier: ViewModifier {
+    let cornerRadius: CGFloat
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Color.primary.opacity(0.045))
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(Color.primary.opacity(0.07), lineWidth: BrandPalette.Surface.hairline)
+            }
+    }
+}
+
 extension View {
     func glassSurface(cornerRadius: CGFloat = BrandPalette.Radius.card) -> some View {
         modifier(GlassSurfaceModifier(cornerRadius: cornerRadius))
+    }
+
+    func contentSurface(cornerRadius: CGFloat = BrandPalette.Radius.card) -> some View {
+        modifier(ContentSurfaceModifier(cornerRadius: cornerRadius))
     }
 }

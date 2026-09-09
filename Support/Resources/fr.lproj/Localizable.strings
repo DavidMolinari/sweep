@@ -54,6 +54,11 @@
 "status.scanning" = "Analyse en cours…";
 "status.scanned %@" = "%@ analysés";
 
+"a11y.selected" = "Sélectionné";
+"a11y.notSelected" = "Non sélectionné";
+"a11y.protected" = "Protégé";
+"a11y.toggle.hint" = "Coche ou décoche cet élément pour le nettoyage";
+
 "detail.emptySelection" = "Sélectionnez une catégorie";
 
 "items.count.one %lld" = "%lld élément";
@@ -74,9 +79,12 @@
 "cleanbar.emptyTrash.help" = "Supprime définitivement le contenu de la corbeille";
 "cleanbar.selectAll.help" = "Sélectionne tous les éléments";
 "cleanbar.selectAll.warningHelp" = "« Tout sélectionner » ne coche que les éléments sans avertissement";
+"cleanbar.selectSafe" = "Cocher les éléments sûrs";
+"cleanbar.selectAll.warningNote" = "Les éléments signalés restent décochés";
 "cleanbar.flagged.help" = "Éléments décochés par prudence (app active, archive, base de données…) — à vérifier avant de sélectionner";
 "cleanbar.flagged.hideHelp" = "Réafficher tous les éléments";
 "filter.all %lld" = "Tout (%lld)";
+"filter.title" = "Afficher";
 "filter.runningHint" = "Quittez les apps concernées, puis relancez l'analyse";
 
 "confirm.title.clean" = "Nettoyer ces fichiers ?";
@@ -93,8 +101,10 @@
 "empty.nothingToClean.title" = "Rien à nettoyer";
 "empty.nothingToClean.message" = "Aucun élément détecté dans cette catégorie.";
 "empty.notScanned.title" = "Aucune analyse pour le moment";
+"empty.notScanned.message" = "Les éléments cochés sont placés dans la corbeille — rien n'est effacé, sauf lorsque vous videz la corbeille.";
 
 "failure.title" = "Analyse impossible";
+"scan.partial.title" = "Certains emplacements ont été ignorés";
 
 "largeFiles.minSize" = "Taille minimale";
 "largeFiles.olderThan6Months" = "Modifiés il y a plus de 6 mois";
