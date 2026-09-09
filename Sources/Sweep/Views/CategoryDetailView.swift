@@ -55,6 +55,13 @@ struct CategoryDetailView: View {
         .ignoresSafeArea()
     }
 
+    private func showsFullDiskAccessAction(for result: CategoryResult) -> Bool {
+        result.diagnostics.rootFailures.contains { failure in
+            if case .unreadable = failure.issue { return true }
+            return false
+        }
+    }
+
     @ViewBuilder
     private func content(for result: CategoryResult, items: [ScanItem]) -> some View {
         switch result.state {
@@ -84,7 +91,10 @@ struct CategoryDetailView: View {
             }
         case .failed(let message):
             if result.items.isEmpty {
-                FailureView(message: message) {
+                FailureView(
+                    message: message,
+                    showsFullDiskAccessAction: showsFullDiskAccessAction(for: result)
+                ) {
                     model.scan(category)
                 }
             } else {

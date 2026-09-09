@@ -71,7 +71,9 @@ struct ScanningView: View {
 }
 
 struct FailureView: View {
+    @EnvironmentObject private var model: AppModel
     let message: String
+    var showsFullDiskAccessAction: Bool = false
     let retry: () -> Void
 
     var body: some View {
@@ -88,12 +90,22 @@ struct FailureView: View {
                     .frame(maxWidth: 420)
             }
 
-            Button("action.retry", action: retry)
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
-                .controlSize(.large)
-                .tint(BrandPalette.Semantic.caution)
-                .padding(.top, 2)
+            HStack(spacing: 10) {
+                Button("action.retry", action: retry)
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.large)
+                    .tint(BrandPalette.Semantic.caution)
+
+                if showsFullDiskAccessAction {
+                    Button("settings.storage.fullDiskAccess.open") {
+                        model.openFullDiskAccessSettings()
+                    }
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.large)
+                }
+            }
+            .padding(.top, 2)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
