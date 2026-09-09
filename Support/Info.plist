@@ -4,6 +4,16 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Sweep</string>
+	<key>CFBundleExecutable</key>
+	<string>Sweep</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.github.davidmolinari.sweep</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
@@ -11,38 +21,28 @@
 		<string>de</string>
 		<string>es</string>
 	</array>
-	<key>CFBundleExecutable</key>
-	<string>Sweep</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.github.davidmolinari.sweep</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>Sweep</string>
-	<key>CFBundleDisplayName</key>
-	<string>Sweep</string>
-	<key>CFBundleIconFile</key>
-	<string>AppIcon</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.0</string>
+	<string>1.1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>14.0</string>
+	<string>2</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
-	<key>NSHighResolutionCapable</key>
-	<true/>
-	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2026 David Molinari — MIT License</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
 	<key>NSDesktopFolderUsageDescription</key>
 	<string>Sweep analyzes large files on the Desktop.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>Sweep analyzes large files in Documents.</string>
 	<key>NSDownloadsFolderUsageDescription</key>
 	<string>Sweep analyzes large files in Downloads.</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2026 David Molinari — MIT License</string>
 	<key>NSRemovableVolumesUsageDescription</key>
 	<string>Sweep analyzes the selected volumes.</string>
 </dict>
