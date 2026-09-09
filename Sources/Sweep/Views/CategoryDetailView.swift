@@ -30,6 +30,7 @@ struct CategoryDetailView: View {
                     runningCount: runningCount,
                     rescan: { model.scan(category) }
                 )
+                .disabled(model.isCleaning(category))
             }
             content(for: result, items: shownItems)
             CleanBar(
@@ -71,7 +72,15 @@ struct CategoryDetailView: View {
                     model.scan(category)
                 }
             } else {
-                ItemListView(category: category, items: items)
+                VStack(spacing: 0) {
+                    if result.partialFailure {
+                        PartialScanBanner(diagnostics: result.diagnostics) {
+                            model.scan(category)
+                        }
+                    }
+                    ItemListView(category: category, items: items)
+                        .disabled(model.isCleaning(category))
+                }
             }
         case .failed(let message):
             if result.items.isEmpty {
@@ -80,10 +89,11 @@ struct CategoryDetailView: View {
                 }
             } else {
                 VStack(spacing: 0) {
-                    PartialScanBanner(message: message) {
+                    PartialScanBanner(message: message, diagnostics: result.diagnostics) {
                         model.scan(category)
                     }
                     ItemListView(category: category, items: items)
+                        .disabled(model.isCleaning(category))
                 }
             }
         }
@@ -415,6 +425,10 @@ struct CleanBar: View {
     let flaggedCount: Int
     @Binding var showOnlyFlagged: Bool
 
+    private var isCleaning: Bool {
+        model.isCleaning(category)
+    }
+
     private var allSelected: Bool {
         let selectable = result.items.filter(\.safety.isSelectable)
         return !selectable.isEmpty && selectable.allSatisfy(\.isSelected)
@@ -435,6 +449,7 @@ struct CleanBar: View {
                         model.toggleSelectAll(in: category)
                     }
                     .controlSize(.large)
+                    .disabled(isCleaning)
                     .help(flaggedCount > 0
                           ? "cleanbar.selectAll.warningHelp"
                           : "cleanbar.selectAll.help")
@@ -461,6 +476,7 @@ struct CleanBar: View {
                             }
                     }
                     .buttonStyle(.plain)
+                    .disabled(isCleaning)
                     .help(showOnlyFlagged ? "cleanbar.flagged.hideHelp" : "cleanbar.flagged.help")
                 }
 
@@ -480,25 +496,47 @@ struct CleanBar: View {
                         .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: result.selectedSize)
                 }
 
-                Button {
-                    model.requestClean(category)
-                } label: {
-                    Label(category.isPermanentDeletion ? "cleanbar.emptyTrash" : "cleanbar.clean",
-                          systemImage: category.isPermanentDeletion ? "trash.slash" : "sparkles")
-                        .frame(minWidth: 90)
+                if isCleaning {
+                    cleaningStatus
+                } else {
+                    Button {
+                        model.requestClean(category)
+                    } label: {
+                        Label(category.isPermanentDeletion ? "cleanbar.emptyTrash" : "cleanbar.clean",
+                              systemImage: category.isPermanentDeletion ? "trash.slash" : "sparkles")
+                            .frame(minWidth: 90)
+                    }
+                    .controlSize(.large)
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.capsule)
+                    .tint(category.isPermanentDeletion ? .red : .accentColor)
+                    .disabled(result.selectedItems.isEmpty || result.state == .scanning)
+                    .help(category.isPermanentDeletion
+                          ? "cleanbar.emptyTrash.help"
+                          : "cleanbar.clean.help")
                 }
-                .controlSize(.large)
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
-                .tint(category.isPermanentDeletion ? .red : .accentColor)
-                .disabled(result.selectedItems.isEmpty || result.state == .scanning)
-                .help(category.isPermanentDeletion
-                      ? "cleanbar.emptyTrash.help"
-                      : "cleanbar.clean.help")
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
         }
         .background(.ultraThinMaterial)
+    }
+
+    private var cleaningStatus: some View {
+        HStack(spacing: 8) {
+            ProgressView()
+                .controlSize(.small)
+                .accessibilityHidden(true)
+            Text("cleanbar.cleaning")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            Button("action.cancel") {
+                model.cancelClean(category)
+            }
+            .controlSize(.large)
+            .help("cleanbar.cleaning.help")
+        }
+        .accessibilityElement(children: .contain)
     }
 }

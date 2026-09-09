@@ -29,6 +29,11 @@
 "refusal.protectedItem" = "protected item, deletion refused";
 "clean.failure.reason %@ %@" = "%@: %@";
 
+"scan.issue.symlink" = "symbolic link refused";
+"scan.issue.notDirectory" = "not a folder";
+"scan.issue.missing" = "folder not available";
+"scan.issue.notAllowed" = "location not allowed";
+
 "action.scan" = "Scan";
 "action.rescan" = "Rescan";
 "action.cancel" = "Cancel";
@@ -73,9 +78,16 @@
 "items.failures.other %lld" = "%lld items not deleted";
 "summary.pair %@ %@" = "%@ · %@";
 
+"scan.skipped.one %lld" = "%lld item could not be read";
+"scan.skipped.other %lld" = "%lld items could not be read";
+"scan.roots.one %lld" = "%lld location skipped";
+"scan.roots.other %lld" = "%lld locations skipped";
+
 "cleanbar.clean" = "Clean";
 "cleanbar.emptyTrash" = "Empty Trash";
 "cleanbar.clean.help" = "Move the selection to the Trash (recoverable)";
+"cleanbar.cleaning" = "Cleaning…";
+"cleanbar.cleaning.help" = "Cancels the cleanup; items already removed are not restored";
 "cleanbar.emptyTrash.help" = "Permanently delete the Trash contents";
 "cleanbar.selectAll.help" = "Selects all items";
 "cleanbar.selectAll.warningHelp" = "“Select All” only checks items without a warning";
@@ -97,6 +109,8 @@
 "report.title.partial" = "Partial cleaning";
 "report.done.permanent" = "Permanent deletion completed.";
 "report.done.trashed" = "The items were moved to the Trash.";
+"report.metric.permanent" = "Permanently deleted";
+"report.metric.trash" = "Moved to the Trash (recoverable)";
 
 "empty.nothingToClean.title" = "Nothing to clean";
 "empty.nothingToClean.message" = "No items found in this category.";

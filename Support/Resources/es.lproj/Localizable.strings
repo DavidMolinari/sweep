@@ -29,6 +29,11 @@
 "refusal.protectedItem" = "elemento protegido, eliminación rechazada";
 "clean.failure.reason %@ %@" = "%@: %@";
 
+"scan.issue.symlink" = "enlace simbólico rechazado";
+"scan.issue.notDirectory" = "no es una carpeta";
+"scan.issue.missing" = "carpeta no disponible";
+"scan.issue.notAllowed" = "ubicación no permitida";
+
 "action.scan" = "Analizar";
 "action.rescan" = "Volver a analizar";
 "action.cancel" = "Cancelar";
@@ -73,9 +78,16 @@
 "items.failures.other %lld" = "%lld elementos no eliminados";
 "summary.pair %@ %@" = "%@ · %@";
 
+"scan.skipped.one %lld" = "%lld elemento ilegible";
+"scan.skipped.other %lld" = "%lld elementos ilegibles";
+"scan.roots.one %lld" = "%lld ubicación omitida";
+"scan.roots.other %lld" = "%lld ubicaciones omitidas";
+
 "cleanbar.clean" = "Limpiar";
 "cleanbar.emptyTrash" = "Vaciar la Papelera";
 "cleanbar.clean.help" = "Mueve la selección a la Papelera (recuperable)";
+"cleanbar.cleaning" = "Limpiando…";
+"cleanbar.cleaning.help" = "Cancela la limpieza; los elementos ya eliminados no se restauran";
 "cleanbar.emptyTrash.help" = "Elimina definitivamente el contenido de la Papelera";
 "cleanbar.selectAll.help" = "Selecciona todos los elementos";
 "cleanbar.selectAll.warningHelp" = "«Seleccionar todo» solo marca los elementos sin advertencia";
@@ -97,6 +109,8 @@
 "report.title.partial" = "Limpieza parcial";
 "report.done.permanent" = "Eliminación definitiva realizada.";
 "report.done.trashed" = "Los elementos se movieron a la Papelera.";
+"report.metric.permanent" = "Eliminados permanentemente";
+"report.metric.trash" = "Movidos a la Papelera (recuperables)";
 
 "empty.nothingToClean.title" = "Nada que limpiar";
 "empty.nothingToClean.message" = "No se detectaron elementos en esta categoría.";

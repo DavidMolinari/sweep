@@ -101,8 +101,47 @@ struct FailureView: View {
 
 struct PartialScanBanner: View {
     @EnvironmentObject private var model: AppModel
-    let message: String
+    var message: String = ""
+    var diagnostics: DiskScanner.ScanDiagnostics = .none
     let retry: () -> Void
+
+    private var showsFullDiskAccessAction: Bool {
+        diagnostics.rootFailures.contains { failure in
+            if case .unreadable = failure.issue { return true }
+            return false
+        }
+    }
+
+    private var detailLines: [String] {
+        var lines = diagnostics.rootFailures.prefix(2).map { failure in
+            "\(failure.path) — \(Self.label(for: failure.issue))"
+        }
+        var summary: [String] = []
+        let hiddenRoots = diagnostics.rootFailures.count - lines.count
+        if hiddenRoots > 0 {
+            summary.append(L10n.skippedRoots(hiddenRoots))
+        }
+        if diagnostics.skippedItems > 0 {
+            summary.append(L10n.skippedItems(diagnostics.skippedItems))
+        }
+        if !summary.isEmpty {
+            lines.append(summary.joined(separator: " · "))
+        }
+        if lines.isEmpty, !message.isEmpty {
+            lines.append(message)
+        }
+        return lines
+    }
+
+    private static func label(for issue: DiskScanner.ScanDiagnostics.RootIssue) -> String {
+        switch issue {
+        case .symlink: String(localized: "scan.issue.symlink")
+        case .notDirectory: String(localized: "scan.issue.notDirectory")
+        case .missing: String(localized: "scan.issue.missing")
+        case .notAllowed: String(localized: "scan.issue.notAllowed")
+        case .unreadable(let detail): detail
+        }
+    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
@@ -110,23 +149,27 @@ struct PartialScanBanner: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(BrandPalette.Semantic.caution)
 
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text("scan.partial.title")
                     .font(.caption.weight(.semibold))
-                if !message.isEmpty {
-                    Text(message)
+                ForEach(detailLines, id: \.self) { line in
+                    Text(line)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .help(line)
                 }
             }
 
             Spacer(minLength: 8)
 
-            Button("settings.storage.fullDiskAccess.open") {
-                model.openFullDiskAccessSettings()
+            if showsFullDiskAccessAction {
+                Button("settings.storage.fullDiskAccess.open") {
+                    model.openFullDiskAccessSettings()
+                }
+                .controlSize(.small)
             }
-            .controlSize(.small)
 
             Button("action.retry", action: retry)
                 .controlSize(.small)
@@ -143,6 +186,5 @@ struct PartialScanBanner: View {
         }
         .padding(.horizontal, 14)
         .padding(.bottom, 8)
-        .accessibilityElement(children: .combine)
     }
 }

@@ -29,6 +29,11 @@
 "refusal.protectedItem" = "geschütztes Objekt, Löschen abgelehnt";
 "clean.failure.reason %@ %@" = "%@: %@";
 
+"scan.issue.symlink" = "symbolischer Link abgelehnt";
+"scan.issue.notDirectory" = "kein Ordner";
+"scan.issue.missing" = "Ordner nicht verfügbar";
+"scan.issue.notAllowed" = "Speicherort nicht zulässig";
+
 "action.scan" = "Scannen";
 "action.rescan" = "Erneut scannen";
 "action.cancel" = "Abbrechen";
@@ -73,9 +78,16 @@
 "items.failures.other %lld" = "%lld Objekte nicht gelöscht";
 "summary.pair %@ %@" = "%@ · %@";
 
+"scan.skipped.one %lld" = "%lld Objekt war nicht lesbar";
+"scan.skipped.other %lld" = "%lld Objekte waren nicht lesbar";
+"scan.roots.one %lld" = "%lld Speicherort übersprungen";
+"scan.roots.other %lld" = "%lld Speicherorte übersprungen";
+
 "cleanbar.clean" = "Bereinigen";
 "cleanbar.emptyTrash" = "Papierkorb leeren";
 "cleanbar.clean.help" = "Verschiebt die Auswahl in den Papierkorb (wiederherstellbar)";
+"cleanbar.cleaning" = "Bereinigung läuft…";
+"cleanbar.cleaning.help" = "Bricht die Bereinigung ab; bereits entfernte Objekte werden nicht wiederhergestellt";
 "cleanbar.emptyTrash.help" = "Löscht den Inhalt des Papierkorbs endgültig";
 "cleanbar.selectAll.help" = "Wählt alle Objekte aus";
 "cleanbar.selectAll.warningHelp" = "„Alle auswählen“ markiert nur Objekte ohne Warnung";
@@ -97,6 +109,8 @@
 "report.title.partial" = "Bereinigung teilweise";
 "report.done.permanent" = "Endgültige Löschung durchgeführt.";
 "report.done.trashed" = "Die Objekte wurden in den Papierkorb verschoben.";
+"report.metric.permanent" = "Endgültig gelöscht";
+"report.metric.trash" = "In den Papierkorb verschoben (wiederherstellbar)";
 
 "empty.nothingToClean.title" = "Nichts zu bereinigen";
 "empty.nothingToClean.message" = "In dieser Kategorie wurden keine Objekte gefunden.";

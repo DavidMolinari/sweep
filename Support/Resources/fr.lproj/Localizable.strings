@@ -29,6 +29,11 @@
 "refusal.protectedItem" = "élément protégé, suppression refusée";
 "clean.failure.reason %@ %@" = "%@ : %@";
 
+"scan.issue.symlink" = "lien symbolique refusé";
+"scan.issue.notDirectory" = "n'est pas un dossier";
+"scan.issue.missing" = "dossier indisponible";
+"scan.issue.notAllowed" = "emplacement non autorisé";
+
 "action.scan" = "Analyser";
 "action.rescan" = "Relancer l'analyse";
 "action.cancel" = "Annuler";
@@ -73,9 +78,16 @@
 "items.failures.other %lld" = "%lld éléments non supprimés";
 "summary.pair %@ %@" = "%@ · %@";
 
+"scan.skipped.one %lld" = "%lld élément illisible";
+"scan.skipped.other %lld" = "%lld éléments illisibles";
+"scan.roots.one %lld" = "%lld emplacement ignoré";
+"scan.roots.other %lld" = "%lld emplacements ignorés";
+
 "cleanbar.clean" = "Nettoyer";
 "cleanbar.emptyTrash" = "Vider la corbeille";
 "cleanbar.clean.help" = "Déplace la sélection vers la corbeille (récupérable)";
+"cleanbar.cleaning" = "Nettoyage en cours…";
+"cleanbar.cleaning.help" = "Annule le nettoyage ; les éléments déjà traités ne sont pas restaurés";
 "cleanbar.emptyTrash.help" = "Supprime définitivement le contenu de la corbeille";
 "cleanbar.selectAll.help" = "Sélectionne tous les éléments";
 "cleanbar.selectAll.warningHelp" = "« Tout sélectionner » ne coche que les éléments sans avertissement";
@@ -97,6 +109,8 @@
 "report.title.partial" = "Nettoyage partiel";
 "report.done.permanent" = "Suppression définitive effectuée.";
 "report.done.trashed" = "Les éléments ont été placés dans la corbeille.";
+"report.metric.permanent" = "Supprimés définitivement";
+"report.metric.trash" = "Déplacés vers la corbeille (récupérables)";
 
 "empty.nothingToClean.title" = "Rien à nettoyer";
 "empty.nothingToClean.message" = "Aucun élément détecté dans cette catégorie.";

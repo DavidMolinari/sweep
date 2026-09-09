@@ -35,6 +35,18 @@ enum L10n {
         String(localized: "filter.all \(count)")
     }
 
+    static func skippedItems(_ count: Int) -> String {
+        count == 1
+            ? String(localized: "scan.skipped.one \(count)")
+            : String(localized: "scan.skipped.other \(count)")
+    }
+
+    static func skippedRoots(_ count: Int) -> String {
+        count == 1
+            ? String(localized: "scan.roots.one \(count)")
+            : String(localized: "scan.roots.other \(count)")
+    }
+
     static func pair(_ first: String, _ second: String) -> String {
         String(localized: "summary.pair \(first) \(second)")
     }

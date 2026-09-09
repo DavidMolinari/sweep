@@ -66,6 +66,11 @@ struct CleanReportView: View {
     @Environment(\.dismiss) private var dismiss
     let report: CleanReport
 
+    private var metricText: String {
+        let bytes = report.permanent ? report.freed : report.movedToTrash
+        return L10n.pair(bytes.formatted(.byteCount(style: .file)), L10n.removedCount(report.removed))
+    }
+
     var body: some View {
         VStack(spacing: 18) {
             IconMedallion(
@@ -77,9 +82,12 @@ struct CleanReportView: View {
             VStack(spacing: 6) {
                 Text(report.failures.isEmpty ? "report.title.success" : "report.title.partial")
                     .font(.title3.weight(.semibold))
-                Text(verbatim: L10n.pair(report.freed.formatted(.byteCount(style: .file)), L10n.removedCount(report.removed)))
+                Text(verbatim: metricText)
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
+                Text(report.permanent ? "report.metric.permanent" : "report.metric.trash")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             if !report.failures.isEmpty {
