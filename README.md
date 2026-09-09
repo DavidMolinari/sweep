@@ -14,6 +14,14 @@ dependency, no telemetry, no networking.
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform: macOS 14+](https://img.shields.io/badge/platform-macOS%2014%2B-black.svg)
 
+## Download
+
+Grab the DMG from the **[latest release](https://github.com/DavidMolinari/sweep/releases/latest)**, open it, and drag **Sweep** into **Applications**.
+
+> The app is signed ad-hoc (not notarized yet): on first launch, right-click Sweep in Applications and choose **Open**.
+
+Prefer to build it yourself? `make run` compiles and launches the app.
+
 ## Screenshots
 
 | Light | Dark |

@@ -15,6 +15,14 @@ sans télémétrie, sans réseau.
 [![Licence : MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Plateforme : macOS 14+](https://img.shields.io/badge/platform-macOS%2014%2B-black.svg)
 
+## Téléchargement
+
+Prenez le DMG sur la **[dernière release](https://github.com/DavidMolinari/sweep/releases/latest)**, ouvrez-le et glissez **Sweep** dans **Applications**.
+
+> L'app est signée ad-hoc (pas encore notariée) : au premier lancement, faites un clic droit sur Sweep dans Applications puis **Ouvrir**.
+
+Pour la compiler vous-même : `make run` compile et lance l'app.
+
 ## Captures d'écran
 
 | Clair | Sombre |

@@ -34,8 +34,8 @@ jobs:
           fi
           echo "→ releasing ${version}"
 
-      - name: Build, self-test, archive and checksum
-        run: make release
+      - name: Build, self-test, package (zip + dmg) and checksum
+        run: make dmg
 
       - name: Extract release notes from CHANGELOG
         run: |
@@ -56,6 +56,8 @@ jobs:
           draft: true
           body_path: release-notes.md
           files: |
+            dist/Sweep-*.dmg
+            dist/Sweep-*.dmg.sha256
             dist/Sweep-*.zip
             dist/Sweep-*.zip.sha256
           fail_on_unmatched_files: true

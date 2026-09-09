@@ -4,8 +4,9 @@ BUNDLE  = dist/$(APP).app
 ICON    = Support/Branding/AppIcon.icns
 STAGE   = dist/release
 ARCHIVE = dist/$(APP)-$(VERSION).zip
+DMG     = dist/$(APP)-$(VERSION).dmg
 
-.PHONY: build app run install release clean
+.PHONY: build app run install release dmg clean
 
 build:
 	@if swift build -c release --arch arm64 --arch x86_64; then \
@@ -63,6 +64,18 @@ release: app
 	cd dist && shasum -a 256 -c "$(notdir $(ARCHIVE)).sha256"
 	@echo "→ $(ARCHIVE)"
 	@cat "$(ARCHIVE).sha256"
+
+dmg: release
+	rm -rf dist/dmg "$(DMG)" "$(DMG).sha256"
+	mkdir -p dist/dmg
+	ditto "$(BUNDLE)" "dist/dmg/$(APP).app"
+	ln -s /Applications "dist/dmg/Applications"
+	hdiutil create -volname "$(APP) $(VERSION)" -srcfolder dist/dmg -ov -format UDZO "$(DMG)"
+	rm -rf dist/dmg
+	cd dist && shasum -a 256 "$(notdir $(DMG))" > "$(notdir $(DMG)).sha256"
+	cd dist && shasum -a 256 -c "$(notdir $(DMG)).sha256"
+	@echo "→ $(DMG)"
+	@cat "$(DMG).sha256"
 
 clean:
 	swift package clean
