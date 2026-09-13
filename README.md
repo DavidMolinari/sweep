@@ -161,15 +161,25 @@ on every push.
 
 ## Full Disk Access
 
-Sweep works without it. Granting Full Disk Access widens the readable scope of
-the scan, which is useful to see caches and logs protected by TCC (Mail,
-Safari, other apps):
+macOS protects some locations with TCC. Without Full Disk Access, Sweep cannot
+list:
+
+- `~/.Trash` — emptying the Trash requires reading it first;
+- libraries and caches owned by other apps (Mail, Safari, Messages…).
+
+In that case the category shows an explicit failure with an **Open Full Disk
+Access…** button instead of pretending the folder is empty.
+
+Recommended right after installing:
 
 1. System Settings → Privacy & Security → **Full Disk Access**.
-2. Add `dist/Sweep.app` (or `/Applications/Sweep.app`).
+2. Add `Sweep.app` (from `/Applications`, or `dist/Sweep.app` for local builds)
+   and enable it.
+3. Rescan the category.
 
-Because local builds are signed ad-hoc rather than with a Developer ID, macOS
-may ask again after `make app` replaces the binary.
+Because builds are signed ad-hoc rather than with a Developer ID, macOS may ask
+again after `make app` replaces the binary — remove and re-add the app if a scan
+suddenly reports permission failures again.
 
 ## Localization
 

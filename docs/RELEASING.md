@@ -154,4 +154,7 @@ The release notes must include:
   tagged commit.
 - Download the archive from the release page on a clean machine (or a fresh
   user account), verify `shasum -a 256 -c`, and run `--selftest` once.
+- Verify the Full Disk Access story on a machine **without** the permission:
+  `~/.Trash` and other TCC-protected folders must report an explicit failure
+  with the **Open Full Disk Access…** button, never an empty result.
 - Open the next `Unreleased` section in `CHANGELOG.md` if needed.

@@ -168,15 +168,28 @@ casse. La CI l'exécute à chaque push.
 
 ## Accès complet au disque
 
-Sweep fonctionne sans. Accorder l'Accès complet au disque élargit la portée
-lisible du scan, utile pour voir les caches et journaux protégés par TCC (Mail,
-Safari, autres apps) :
+macOS protège certains emplacements via TCC. Sans Accès complet au disque,
+Sweep ne peut pas lister :
+
+- `~/.Trash` — vider la corbeille suppose de pouvoir la lire ;
+- les bibliothèques et caches appartenant à d'autres apps (Mail, Safari,
+  Messages…).
+
+Dans ce cas, la catégorie affiche un échec explicite avec un bouton
+**Ouvrir l'accès complet au disque…** au lieu de faire croire que le dossier
+est vide.
+
+Recommandé juste après l'installation :
 
 1. Réglages Système → Confidentialité et sécurité → **Accès complet au disque**.
-2. Ajouter `dist/Sweep.app` (ou `/Applications/Sweep.app`).
+2. Ajouter `Sweep.app` (depuis `/Applications`, ou `dist/Sweep.app` pour une
+   compilation locale) et l'activer.
+3. Relancer l'analyse de la catégorie.
 
-Les compilations locales étant signées en ad-hoc et non avec un Developer ID,
-macOS peut redemander la permission après un `make app` qui remplace le binaire.
+Les compilations étant signées en ad-hoc et non avec un Developer ID, macOS
+peut redemander la permission après un `make app` qui remplace le binaire —
+retirez puis rajoutez l'app si un scan signale de nouveau des permissions
+refusées.
 
 ## Langues
 
